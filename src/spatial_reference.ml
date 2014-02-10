@@ -41,7 +41,7 @@ let free =
 
 let make kind spec =
   let sr = new_spatial_reference None in
-  Gc.finalise (fun x -> prerr_endline "sr free"; destroy_spatial_reference x) sr;
+  Gc.finalise destroy_spatial_reference sr;
   let result =
     match kind with
     | `proj4 -> import_from_proj4 sr spec
