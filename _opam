@@ -1,0 +1,4 @@
+depexts: [
+  [["debian"] ["libgdal-dev"]]
+  [["ubuntu"] ["libgdal-dev"]]
+]

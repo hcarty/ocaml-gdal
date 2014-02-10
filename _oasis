@@ -1,0 +1,42 @@
+OASISFormat: 0.4
+Name:        gdal
+Version:     0.0.0
+Synopsis:    Bindings to the GDAL and OGR libraries
+Authors:     Hezekiah M. Carty <hez@0ok.org>
+Maintainers: Hezekiah M. Carty <hez@0ok.org>
+Homepage:    https://github.com/hcarty/ocaml-gdal
+License:     MIT
+Plugins:     META (0.4), DevFiles (0.4)
+
+BuildTools:  ocamlbuild
+
+Library ogr
+  Path:            src
+  BuildDepends:    ctypes.foreign
+  Pack:            true
+  Modules:         Data_source,
+                   Driver,
+                   Feature,
+                   Field,
+                   Geometry,
+                   Layer,
+                   Lib,
+                   Spatial_reference
+  InternalModules: T
+
+Flag examples
+  Description: Build examples
+  Default:     true
+
+Executable sanity
+  Path:           examples
+  MainIs:         sanity.ml
+  Build$:         flag(examples)
+  BuildDepends:   ogr
+  Install:        false
+  CompiledObject: best
+
+SourceRepository master
+  Type:     git
+  Location: https://github.com/hcarty/ocaml-gdal.git
+  Browser:  https://github.com/hcarty/ocaml-gdal 

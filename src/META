@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: fd37df94319e059715e39c85f335ce0d)
+version = "0.0.0"
+description = "Bindings to the GDAL and OGR libraries"
+requires = "ctypes.foreign"
+archive(byte) = "ogr.cma"
+archive(byte, plugin) = "ogr.cma"
+archive(native) = "ogr.cmxa"
+archive(native, plugin) = "ogr.cmxs"
+exists_if = "ogr.cma"
+# OASIS_STOP
+
