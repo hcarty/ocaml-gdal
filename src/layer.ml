@@ -4,13 +4,9 @@ open Foreign
 type t = T.t
 let t = T.t
 
-exception OGR_error
+exception Layer_error
 
-let err =
-  view
-    ~read:(fun i -> if i = 0 then () else raise OGR_error)
-    ~write:(fun () -> 0)
-    int
+let err = T.err Layer_error
 
 (* Raw bindings *)
 
