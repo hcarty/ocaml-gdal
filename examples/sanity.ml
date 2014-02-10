@@ -27,15 +27,17 @@ let () =
           let feature_defn = Ogr.Layer.get_layer_defn layer in
           p 5;
           let count = Ogr.Feature.Defn.get_field_count feature_defn in
-          p 6;
-          let field_defn = Ogr.Feature.Defn.get_field_defn feature_defn 0 in
-          p 7;
-          let field_type = Ogr.Field.get_type field_defn in
-          p 8;
-          for i = 0 to count - 1 do
-            print_endline @@ Ogr.Feature.get_as_string feature i;
-          done;
-          p 9;
+          if count > 0 then begin
+            p 6;
+            let field_defn = Ogr.Feature.Defn.get_field_defn feature_defn 0 in
+            p 7;
+            let field_type = Ogr.Field.get_type field_defn in
+            p 8;
+            for i = 0 to count - 1 do
+              print_endline @@ Ogr.Feature.get_as_string feature i;
+            done;
+            p 9;
+          end;
       );
   );
   p 10;
