@@ -1,6 +1,8 @@
 open Ctypes
 open Foreign
 
+exception Geometry_error
+
 type envelope_t = {
   min_x : float;
   max_x : float;
@@ -64,7 +66,7 @@ let wkb_of_int = function
   | 0x80000005 -> MultiLineString25D
   | 0x80000006 -> MultiPolygon25D
   | 0x80000007 -> GeometryCollection25D
-  | _ -> invalid_arg "Geometry.wkb_of_int"
+  | _ -> raise Geometry_error
 
 type t = T.t
 let t = T.t
@@ -72,6 +74,10 @@ let t = T.t
 let get_type =
   Lib.c "OGR_G_GetGeometryType"
     (t @-> returning int)
+
+let get_type t =
+  get_type t
+  |> wkb_of_int
 
 let get_x =
   Lib.c "OGR_G_GetX"

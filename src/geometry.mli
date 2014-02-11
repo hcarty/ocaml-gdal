@@ -1,3 +1,5 @@
+exception Geometry_error
+
 type envelope_t = {
   min_x : float;
   max_x : float;
@@ -31,6 +33,6 @@ type t
 
 val t : t Ctypes.typ
 
-val get_type : t -> int
+val get_type : t -> wkb_t
 val get_x : t -> int -> float
 val get_y : t -> int -> float
