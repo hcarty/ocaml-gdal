@@ -1,11 +1,12 @@
 type t
 
 exception Invalid_source
+exception Data_source_error
 
 val of_source : ?write:bool -> string -> t
 
 val destroy : t -> unit
-val release : t -> int
+val release : t -> unit
 
 val with_source :
   ?write:bool ->

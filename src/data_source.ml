@@ -5,6 +5,9 @@ type t = T.t
 let t = T.t
 
 exception Invalid_source
+exception Data_source_error
+
+let err = T.err Data_source_error
 
 let open_ = (* 'open' is a keyword in OCaml *)
   Lib.c "OGROpen"
@@ -16,7 +19,7 @@ let destroy =
 
 let release =
   Lib.c "OGRReleaseDataSource"
-    (t @-> returning int)
+    (t @-> returning err)
 
 let get_layer_by_name =
   Lib.c "OGR_DS_GetLayerByName"
