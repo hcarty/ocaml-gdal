@@ -1,18 +1,41 @@
+(** {1 OGR Data Sources} *)
+
+(** These are bindings and wrappers around the [OGR_DS_*] API. *)
+
 type t
+(** Data source *)
 
-exception Invalid_source
-exception Data_source_error
+val of_source : ?write:bool -> string -> [ `Invalid_source | `Ok of t ]
+(** [of_source ?write name] opens the source [name] for access.
 
-val of_source : ?write:bool -> string -> t
+    @param write defaults to false (read-only)
+    @param name is source-type specific.  See the upstream OGR documentation
+           for more information.
 
-val destroy : t -> unit
-val release : t -> unit
+    @return `Invalid_source if [name] does not represent a valid data source. *)
 
 val with_source :
   ?write:bool ->
   string ->
   (t -> 'a) ->
-  'a
+  [ `Invalid_source | `Ok of 'a ]
+(** [with_source ?write name f] opens [name] and calls [f src] if [name] is a
+    valid data source.  The data source passed to [f] will be closed if [f]
+    returns normally or raises an exception.
+
+    This is a wrapper around {!of_source}.  See its documentation for a
+    description of the expected arguments. *)
 
 val get_layer_by_name : t -> string -> Layer.t
 val get_layer : t -> int -> Layer.t
+(** [get_layer* src id] returns a {!Layer.t} extracted from [src]. *)
+
+(** {2 Low level wrappers} *)
+
+(** These should not be necessary under normal circumstances. *)
+
+exception Data_source_error
+
+val destroy : t -> unit
+val release : t -> unit
+(** @raise Data_source_error *)
