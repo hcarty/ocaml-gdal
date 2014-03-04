@@ -14,6 +14,7 @@ let () =
   let shapefile = parse_args () in
   Ogr.Lib.init_dynamic ();
   Ogr.Lib.register_all ();
+  let result =
   Ogr.Data_source.with_source shapefile (
     fun ds ->
       p 1;
@@ -31,7 +32,7 @@ let () =
             p 6;
             let field_defn = Ogr.Feature.Defn.get_field_defn feature_defn 0 in
             p 7;
-            let field_type = Ogr.Field.get_type field_defn in
+            let _field_type = Ogr.Field.get_type field_defn in
             p 8;
             for i = 0 to count - 1 do
               print_endline @@ Ogr.Feature.get_as_string feature i;
@@ -39,6 +40,8 @@ let () =
             p 9;
           end;
       );
-  );
-  p 10;
-  ()
+  )
+  in
+  match result with
+  | `Ok () -> print_endline "Ok"
+  | `Invalid_source -> print_endline "Invalid source"
