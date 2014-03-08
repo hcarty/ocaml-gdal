@@ -32,7 +32,7 @@ let () =
             p 6;
             let field_defn = Ogr.Feature.Defn.get_field_defn feature_defn 0 in
             p 7;
-            let _field_type = Ogr.Field.get_type field_defn in
+            let _field_type = Ogr.Field.Defn.get_type field_defn in
             p 8;
             for i = 0 to count - 1 do
               print_endline @@ Ogr.Feature.get_as_string feature i;
