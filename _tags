@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 86cc6f36c174af9f5df2d2b75c6928e6)
+# DO NOT EDIT (digest: a38b189db30de3400d3bfcc959a72d02)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -14,20 +14,20 @@
 "_darcs": -traverse
 "_darcs": not_hygienic
 # Library ogr
-"src/ogr.cmxs": use_ogr
-"src/data_source.cmx": for-pack(Ogr)
-"src/driver.cmx": for-pack(Ogr)
-"src/feature.cmx": for-pack(Ogr)
-"src/field.cmx": for-pack(Ogr)
-"src/geometry.cmx": for-pack(Ogr)
-"src/layer.cmx": for-pack(Ogr)
-"src/lib.cmx": for-pack(Ogr)
-"src/spatial_reference.cmx": for-pack(Ogr)
-"src/t.cmx": for-pack(Ogr)
-<src/*.ml{,i}>: pkg_ctypes.foreign
+"src/ogr/ogr.cmxs": use_ogr
+"src/ogr/data_source.cmx": for-pack(Ogr)
+"src/ogr/driver.cmx": for-pack(Ogr)
+"src/ogr/feature.cmx": for-pack(Ogr)
+"src/ogr/field.cmx": for-pack(Ogr)
+"src/ogr/geometry.cmx": for-pack(Ogr)
+"src/ogr/layer.cmx": for-pack(Ogr)
+"src/ogr/lib.cmx": for-pack(Ogr)
+"src/ogr/spatial_reference.cmx": for-pack(Ogr)
+"src/ogr/t.cmx": for-pack(Ogr)
+<src/ogr/*.ml{,i}>: pkg_ctypes.foreign
 # Executable sanity
-<examples/sanity.{native,byte}>: use_ogr
 <examples/sanity.{native,byte}>: pkg_ctypes.foreign
-<examples/*.ml{,i}>: use_ogr
+<examples/sanity.{native,byte}>: use_ogr
 <examples/*.ml{,i}>: pkg_ctypes.foreign
+<examples/*.ml{,i}>: use_ogr
 # OASIS_STOP
