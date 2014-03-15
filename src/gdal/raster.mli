@@ -3,6 +3,11 @@
 type t
 val t : t Ctypes.typ
 
+type 'a data_t
+
+val int : int data_t
+val float : float data_t
+
 val get_size : t -> int * int
 (** [get_size t] returns the [(x, y)] dimensions in pixels. *)
 
@@ -29,6 +34,7 @@ module Block : sig
 end
 
 (**/**)
+val int_of_data_t : _ data_t -> int
 val get_x_size : t -> int
 val get_y_size : t -> int
 (**/**)

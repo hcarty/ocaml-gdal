@@ -8,6 +8,7 @@ type t = T.t
 let t = T.t
 
 exception Data_set_error
+exception Invalid_transform
 
 let err = T.err Data_set_error
 
@@ -77,3 +78,49 @@ let get_count =
 let get_band =
   Lib.c "GDALGetRasterBand"
     (t @-> int @-> returning Raster.t)
+
+let create_copy =
+  Lib.c "GDALCreateCopy" (
+    Driver.t @->
+    string @->
+    t @->
+    int @->
+    ptr void @-> ptr void @-> ptr void @->
+    returning t
+  )
+
+let create_copy ?(strict = false) src driver name =
+  let dst =
+    create_copy driver name src
+      (if strict then 1 else 0)
+      null null null
+  in
+  if dst = null then
+    `Invalid_source
+  else
+    `Ok dst
+
+let create =
+  Lib.c "GDALCreate" (
+    Driver.t @-> string @-> int @-> int @-> int @-> int @-> ptr void @->
+    returning t
+  )
+
+let create driver name (nx, ny) nbands kind =
+  create driver name nx ny nbands (Raster.int_of_data_t kind) null
+
+let set_geo_transform =
+  Lib.c "GDALSetGeoTransform"
+    (t @-> ptr double @-> returning err)
+
+let set_geo_transform t transform =
+  if Array.length transform < 6 then raise Invalid_transform;
+  let ca = Carray.make double 6 in
+  for i = 0 to 5 do
+    Carray.set ca i transform.(i);
+  done;
+  set_geo_transform t (Carray.start ca)
+
+let set_projection =
+  Lib.c "GDALSetProjection"
+    (t @-> string @-> returning err)

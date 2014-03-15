@@ -120,3 +120,6 @@ module Block = struct
   let write_int t (i, j) data = assert false
   let write_float t (i, j) data = assert false
 end
+
+let int = Int
+let float = Float

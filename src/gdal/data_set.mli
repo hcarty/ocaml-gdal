@@ -53,6 +53,22 @@ val get_band : t -> int -> Raster.t
 
     @param i is 1-based, not 0-based. *)
 
+val create_copy :
+  ?strict:bool ->
+  t -> Driver.t -> string ->
+  [ `Invalid_source | `Ok of t ]
+(** [create_copy ?strict t driver name] *)
+
+val create :
+  Driver.t -> string -> int * int -> int -> 'a Raster.data_t -> t
+(** [create driver name size bands kind] *)
+
+val set_geo_transform : t -> float array -> unit
+
+val set_projection : t -> string -> unit
+(** [set_project t wkt_projection] sets the projection for [t].  The projection
+    string should be in WKT format. *)
+
 (**/**)
 val get_geo_transform : t -> float array
 val origin_of_transform : float array -> float * float

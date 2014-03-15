@@ -11,3 +11,7 @@ let get_short_name =
 let get_long_name =
   Lib.c "GDALGetDriverLongName"
     (t @-> returning string)
+
+let get_by_name =
+  Lib.c "GDALGetDriverByName"
+    (string @-> returning t)
