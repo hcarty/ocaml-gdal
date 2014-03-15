@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: a38b189db30de3400d3bfcc959a72d02)
+# DO NOT EDIT (digest: 5cdc1d733dca19f20bdfb7afe2f0a3bb)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -25,6 +25,14 @@
 "src/ogr/spatial_reference.cmx": for-pack(Ogr)
 "src/ogr/t.cmx": for-pack(Ogr)
 <src/ogr/*.ml{,i}>: pkg_ctypes.foreign
+# Library gdal
+"src/gdal/gdal.cmxs": use_gdal
+"src/gdal/data_set.cmx": for-pack(Gdal)
+"src/gdal/driver.cmx": for-pack(Gdal)
+"src/gdal/lib.cmx": for-pack(Gdal)
+"src/gdal/raster.cmx": for-pack(Gdal)
+"src/gdal/t.cmx": for-pack(Gdal)
+<src/gdal/*.ml{,i}>: pkg_ctypes.foreign
 # Executable sanity
 <examples/sanity.{native,byte}>: pkg_ctypes.foreign
 <examples/sanity.{native,byte}>: use_ogr

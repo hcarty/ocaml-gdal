@@ -24,6 +24,16 @@ Library ogr
                    Spatial_reference
   InternalModules: T
 
+Library gdal
+  Path:            src/gdal
+  BuildDepends:    ctypes.foreign
+  Pack:            true
+  Modules:         Data_set,
+                   Driver,
+                   Lib,
+                   Raster
+  InternalModules: T
+
 Flag examples
   Description: Build examples
   Default:     true
