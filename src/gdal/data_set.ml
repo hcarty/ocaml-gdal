@@ -77,7 +77,7 @@ let get_count =
 
 let get_band =
   Lib.c "GDALGetRasterBand"
-    (t @-> int @-> returning Raster.t)
+    (t @-> int @-> returning Band.t)
 
 let create_copy =
   Lib.c "GDALCreateCopy" (
@@ -107,7 +107,7 @@ let create =
   )
 
 let create driver name (nx, ny) nbands kind =
-  create driver name nx ny nbands (Raster.int_of_data_t kind) null
+  create driver name nx ny nbands (Band.int_of_data_t kind) null
 
 let set_geo_transform =
   Lib.c "GDALSetGeoTransform"

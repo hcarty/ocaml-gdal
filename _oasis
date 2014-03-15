@@ -28,10 +28,10 @@ Library gdal
   Path:            src/gdal
   BuildDepends:    ctypes.foreign
   Pack:            true
-  Modules:         Data_set,
+  Modules:         Band,
+                   Data_set,
                    Driver,
-                   Lib,
-                   Raster
+                   Lib
   InternalModules: T
 
 Flag examples

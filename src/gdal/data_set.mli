@@ -48,7 +48,7 @@ val get_y_size : t -> int
 val get_count : t -> int
 (** [get_count t] returns number of raster bands in [t]. *)
 
-val get_band : t -> int -> Raster.t
+val get_band : t -> int -> Band.t
 (** [get_band t i] returns the [i]th raster band from [t].
 
     @param i is 1-based, not 0-based. *)
@@ -60,7 +60,7 @@ val create_copy :
 (** [create_copy ?strict t driver name] *)
 
 val create :
-  Driver.t -> string -> int * int -> int -> 'a Raster.data_t -> t
+  Driver.t -> string -> int * int -> int -> 'a Band.data_t -> t
 (** [create driver name size bands kind] *)
 
 val set_geo_transform : t -> float array -> unit
