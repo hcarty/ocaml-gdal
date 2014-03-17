@@ -103,6 +103,14 @@ let read_float t = read t Float
 let write_int t data = write t Int data
 let write_float t data = write t Float data
 
+let get_description =
+  Lib.c "GDALGetDescription"
+    (t @-> returning string)
+
+let set_description =
+  Lib.c "GDALSetDescription"
+    (t @-> string @-> returning void)
+
 module Block = struct
   let get_size =
     Lib.c "GDALGetBlockSize"

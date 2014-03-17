@@ -21,6 +21,13 @@ val write_int : t -> int array -> unit
 val write_float : t -> float array -> unit
 (** [write_* t data] writes [data] to [t]. *)
 
+val get_description : t -> string
+(** [get_description t] returns the description of the current band.  If no
+    description exists then the returned string will be empty. *)
+
+val set_description : t -> string -> unit
+(** [set_description t desc] sets the description of [t] to [desc]. *)
+
 module Block : sig
   val get_size : t -> int * int
 
