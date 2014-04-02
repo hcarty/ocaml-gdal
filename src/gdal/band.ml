@@ -7,17 +7,42 @@ module Array = Oarray
 type t = T.t
 let t = T.t
 
-type _ data_t =
-  | Int : int data_t
-  | Float : float data_t
+module Data = struct
+  type _ t =
+    | Byte : int t
+    | UInt16 : int t
+    | Int16 : int t
+    | UInt32 : Unsigned.uint32 t
+    | Int32 : int32 t
+    | Float32 : float t
+    | Float64 : float t
 
-let int_of_data_t : type s. s data_t -> int = function
-  | Int -> 5
-  | Float -> 7
+  let to_int : type s. s t -> int = function
+    | Byte -> 1
+    | UInt16 -> 2
+    | Int16 -> 3
+    | UInt32 -> 4
+    | Int32 -> 5
+    | Float32 -> 6
+    | Float64 -> 7
 
-let element_t_of_data_t : type s. s data_t -> s typ = function
-  | Int -> int
-  | Float -> double
+  let to_element_t : type s. s t -> s typ = function
+    | Byte -> int
+    | UInt16 -> int
+    | Int16 -> int
+    | UInt32 -> uint32_t
+    | Int32 -> int32_t
+    | Float32 -> float
+    | Float64 -> double
+
+  let byte = Byte
+  let uint16 = UInt16
+  let int16 = Int16
+  let uint32 = UInt32
+  let int32 = Int32
+  let float32 = Float32
+  let float64 = Float64
+end
 
 exception IO_error
 
@@ -33,6 +58,23 @@ let get_y_size =
 
 let get_size t =
   get_x_size t, get_y_size t
+
+let get_data_type =
+  Lib.c "GDALGetRasterDataType"
+    (t @-> returning int)
+
+let get_data_type t =
+  let open Data in
+  match get_data_type t with
+  | 1 -> `int Byte
+  | 2 -> `int UInt16
+  | 3 -> `int Int16
+  | 4 -> `uint32 UInt32
+  | 5 -> `int32 Int32
+  | 6 -> `float Float32
+  | 7 -> `float Float64
+  | 0 -> `unknown
+  | _ -> `unhandled
 
 let io =
   Lib.c "GDALRasterIO" (
@@ -54,7 +96,7 @@ let io
     ?(line_spacing = 0)
     ?buffer_size
     t
-    (kind : 'a data_t)
+    (kind : 'a Data.t)
   =
   let (x_size, y_size) as size =
     match size with
@@ -69,10 +111,10 @@ let io
   let c_buffer =
     match write with
     | None ->
-      Carray.make (element_t_of_data_t kind) (buffer_x * buffer_y)
+      Carray.make (Data.to_element_t kind) (buffer_x * buffer_y)
     | Some buffer ->
       Array.to_list buffer
-      |> Carray.of_list (element_t_of_data_t kind)
+      |> Carray.of_list (Data.to_element_t kind)
   in
   io
     t
@@ -84,7 +126,7 @@ let io
     (to_voidp (Carray.start c_buffer))
     buffer_x
     buffer_y
-    (int_of_data_t kind)
+    (Data.to_int kind)
     pixel_spacing
     line_spacing;
   c_buffer
@@ -96,12 +138,6 @@ let read t kind =
 
 let write t kind data =
   ignore (io ~write:data t kind)
-
-let read_int t = read t Int
-let read_float t = read t Float
-
-let write_int t data = write t Int data
-let write_float t data = write t Float data
 
 let get_description =
   Lib.c "GDALGetDescription"
@@ -121,13 +157,4 @@ module Block = struct
     let j = allocate int 0 in
     get_size t i j;
     !@i, !@j
-
-  let read_int t (i, j) = assert false
-  let read_float t (i, j) = assert false
-
-  let write_int t (i, j) data = assert false
-  let write_float t (i, j) data = assert false
 end
-
-let int = Int
-let float = Float

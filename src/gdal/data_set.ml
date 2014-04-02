@@ -107,7 +107,7 @@ let create =
   )
 
 let create driver name (nx, ny) nbands kind =
-  create driver name nx ny nbands (Band.int_of_data_t kind) null
+  create driver name nx ny nbands (Band.Data.to_int kind) null
 
 let set_geo_transform =
   Lib.c "GDALSetGeoTransform"

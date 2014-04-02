@@ -3,23 +3,44 @@
 type t
 val t : t Ctypes.typ
 
-type 'a data_t
+module Data : sig
+  type 'a t
 
-val int : int data_t
-val float : float data_t
+  val byte : int t
+  val uint16 : int t
+  val int16 : int t
+  val uint32 : Unsigned.uint32 t
+  val int32 : int32 t
+  val float32 : float t
+  val float64 : float t
+
+  (**/**)
+  val to_int : _ t -> int
+  (**/**)
+end
 
 val get_size : t -> int * int
 (** [get_size t] returns the [(x, y)] dimensions in pixels. *)
 
-val read_int : t -> int array
-(** [read_int t] reads the values from [t] as integers. *)
+val get_data_type : t -> [
+    `int of int Data.t
+  | `uint32 of Unsigned.uint32 Data.t
+  | `int32 of int32 Data.t
+  | `float of float Data.t
+  | `unknown
+  | `unhandled
+  ]
+(** [get_data_type t] returns the data type of the given raster band.
 
-val read_float : t -> float array
-(** [read_float t] reads the values from [t] as floating point values. *)
+    @return `unknown if GDAL does not know the data type
+    @return `unhandled if the data type is recognized by GDAL but unhandled by
+    the OCaml bindings. *)
 
-val write_int : t -> int array -> unit
-val write_float : t -> float array -> unit
-(** [write_* t data] writes [data] to [t]. *)
+val read : t -> 'a Data.t -> 'a array
+(** [read t kind] reads the values from [t] as [kind] values. *)
+
+val write : t -> 'a Data.t -> 'a array -> unit
+(** [write t kind data] writes the values from [t] as [kind] values. *)
 
 val get_description : t -> string
 (** [get_description t] returns the description of the current band.  If no
@@ -30,18 +51,11 @@ val set_description : t -> string -> unit
 
 module Block : sig
   val get_size : t -> int * int
-
-(*
-  val read_int : t -> int * int -> int array array
-  val read_float : t -> int * int -> float array array
-
-  val write_int : t -> int * int -> int array array -> unit
-  val write_float : t -> int * int -> float array array -> unit
-*)
+  (** [get_size t] returns the native [(x, y)] dimensions of the blocks making
+      up [t]. *)
 end
 
 (**/**)
-val int_of_data_t : _ data_t -> int
 val get_x_size : t -> int
 val get_y_size : t -> int
 (**/**)

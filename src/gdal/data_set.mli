@@ -60,7 +60,7 @@ val create_copy :
 (** [create_copy ?strict t driver name] *)
 
 val create :
-  Driver.t -> string -> int * int -> int -> 'a Band.data_t -> t
+  Driver.t -> string -> int * int -> int -> 'a Band.Data.t -> t
 (** [create driver name size bands kind] *)
 
 val set_geo_transform : t -> float array -> unit
