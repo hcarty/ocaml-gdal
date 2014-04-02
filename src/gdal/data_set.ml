@@ -8,7 +8,6 @@ type t = T.t
 let t = T.t
 
 exception Data_set_error
-exception Invalid_transform
 
 let err = T.err Data_set_error
 
@@ -55,6 +54,9 @@ let origin_of_transform gt =
 let pixel_size_of_transform gt =
   gt.(1), gt.(5)
 
+let rotation_of_transform gt =
+  gt.(2), gt.(4)
+
 let get_origin t =
   let gt = get_geo_transform t in
   origin_of_transform gt
@@ -62,6 +64,10 @@ let get_origin t =
 let get_pixel_size t =
   let gt = get_geo_transform t in
   pixel_size_of_transform gt
+
+let get_rotation t =
+  let gt = get_geo_transform t in
+  rotation_of_transform gt
 
 let get_x_size =
   Lib.c "GDALGetRasterXSize"
@@ -114,12 +120,22 @@ let set_geo_transform =
     (t @-> ptr double @-> returning err)
 
 let set_geo_transform t transform =
-  if Array.length transform < 6 then raise Invalid_transform;
+  assert (Array.length transform = 6);
   let ca = Carray.make double 6 in
   for i = 0 to 5 do
     Carray.set ca i transform.(i);
   done;
   set_geo_transform t (Carray.start ca)
+
+let set_geo_transform t ~origin ~pixel_size ~rotation =
+  set_geo_transform t [|
+    fst origin;
+    fst pixel_size;
+    fst rotation;
+    snd origin;
+    snd rotation;
+    snd pixel_size;
+  |]
 
 let set_projection =
   Lib.c "GDALSetProjection"

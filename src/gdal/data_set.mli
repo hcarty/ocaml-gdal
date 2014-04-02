@@ -41,6 +41,9 @@ val get_origin : t -> float * float
 val get_pixel_size : t -> float * float
 (** [get_pixel_size t] returns the [(x, y)] pixel size of the rasters in [t]. *)
 
+val get_rotation : t -> float * float
+(** [get_rotation t] returns the rotation of rasters in [t]. *)
+
 val get_x_size : t -> int
 val get_y_size : t -> int
 (** [get_x/y_size t] returns the [x] or [y] dimension of [t]'s rasters. *)
@@ -61,17 +64,22 @@ val create_copy :
 
 val create :
   Driver.t -> string -> int * int -> int -> 'a Band.Data.t -> t
-(** [create driver name size bands kind] *)
+(** [create driver name size bands kind] creates a new {!t} with the given
+    specifications.
 
-val set_geo_transform : t -> float array -> unit
+    @param size specifies the [(x, y)] dimensions of bands in pixels
+    @param bands specifies the number of bands in the data set
+    @param kind specifies the data type used to store data internally *)
+
+val set_geo_transform :
+  t ->
+  origin:float * float ->
+  pixel_size:float * float ->
+  rotation:float * float ->
+  unit
+(** [set_geo_transform t ~origin ~pixel_size ~rotation] sets the geotransform
+    data for [t]. *)
 
 val set_projection : t -> string -> unit
 (** [set_project t wkt_projection] sets the projection for [t].  The projection
     string should be in WKT format. *)
-
-(**/**)
-val get_geo_transform : t -> float array
-val origin_of_transform : float array -> float * float
-val pixel_size_of_transform : float array -> float * float
-(**/**)
-
