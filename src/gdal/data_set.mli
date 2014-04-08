@@ -58,14 +58,18 @@ val get_band : t -> int -> Band.t
 
 val create_copy :
   ?strict:bool ->
+  ?options:string list ->
   t -> Driver.t -> string ->
   [ `Invalid_source | `Ok of t ]
-(** [create_copy ?strict t driver name] *)
+(** [create_copy ?strict ?options t driver name] creates a copy of [t].
+
+    @param driver specifies the driver to use for the copy. *)
 
 val create :
+  ?options:string list ->
   Driver.t -> string -> int * int -> int -> 'a Band.Data.t -> t
-(** [create driver name size bands kind] creates a new {!t} with the given
-    specifications.
+(** [create ?options driver name size bands kind] creates a new {!t} with the
+    given specifications.
 
     @param size specifies the [(x, y)] dimensions of bands in pixels
     @param bands specifies the number of bands in the data set

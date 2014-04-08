@@ -91,15 +91,16 @@ let create_copy =
     string @->
     t @->
     int @->
-    ptr void @-> ptr void @-> ptr void @->
+    ptr string @-> ptr void @-> ptr void @->
     returning t
   )
 
-let create_copy ?(strict = false) src driver name =
+let create_copy ?(strict = false) ?(options = []) src driver name =
+  let options = Carray.of_list string options in
   let dst =
     create_copy driver name src
       (if strict then 1 else 0)
-      null null null
+      (Carray.start options) null null
   in
   if dst = null then
     `Invalid_source
@@ -108,12 +109,14 @@ let create_copy ?(strict = false) src driver name =
 
 let create =
   Lib.c "GDALCreate" (
-    Driver.t @-> string @-> int @-> int @-> int @-> int @-> ptr void @->
+    Driver.t @-> string @-> int @-> int @-> int @-> int @-> ptr string @->
     returning t
   )
 
-let create driver name (nx, ny) nbands kind =
-  create driver name nx ny nbands (Band.Data.to_int kind) null
+let create ?(options = []) driver name (nx, ny) nbands kind =
+  let options = Carray.of_list string options in
+  create
+    driver name nx ny nbands (Band.Data.to_int kind) (Carray.start options)
 
 let set_geo_transform =
   Lib.c "GDALSetGeoTransform"
