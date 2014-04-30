@@ -45,6 +45,7 @@ module Data = struct
 end
 
 exception IO_error
+exception Invalid_dimensions
 
 let err = T.err IO_error
 
@@ -104,9 +105,18 @@ let io
     | Some s -> s
   in
   let buffer_x, buffer_y =
-    match buffer_size with
-    | None -> size
-    | Some s -> s
+    let bx, by =
+      match buffer_size with
+      | None -> size
+      | Some s -> s
+    in
+    match write with
+    | None -> bx, by
+    | Some a ->
+      if bx * by <= Array.length a then
+        bx, by
+      else
+        raise Invalid_dimensions
   in
   let c_buffer =
     match write with
@@ -131,13 +141,15 @@ let io
     line_spacing;
   c_buffer
 
-let read t kind =
-  let c_array = io t kind in
+let read ?offset ?size ?pixel_spacing ?line_spacing ?buffer_size t kind =
+  let c_array =
+    io ?offset ?size ?pixel_spacing ?line_spacing ?buffer_size t kind
+  in
   Carray.to_list c_array
   |> Array.of_list
 
-let write t kind data =
-  ignore (io ~write:data t kind)
+let write ?offset ?size ?pixel_spacing ?line_spacing t kind data =
+  ignore (io ~write:data ?offset ?size ?pixel_spacing ?line_spacing t kind)
 
 let get_description =
   Lib.c "GDALGetDescription"

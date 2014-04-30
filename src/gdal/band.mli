@@ -19,6 +19,9 @@ module Data : sig
   (**/**)
 end
 
+exception IO_error
+exception Invalid_dimensions
+
 val get_size : t -> int * int
 (** [get_size t] returns the [(x, y)] dimensions in pixels. *)
 
@@ -36,10 +39,21 @@ val get_data_type : t -> [
     @return `unhandled if the data type is recognized by GDAL but unhandled by
     the OCaml bindings. *)
 
-val read : t -> 'a Data.t -> 'a array
+val read :
+  ?offset:int * int ->
+  ?size:int * int ->
+  ?pixel_spacing:int ->
+  ?line_spacing:int ->
+  ?buffer_size:int * int ->
+  t -> 'a Data.t -> 'a array
 (** [read t kind] reads the values from [t] as [kind] values. *)
 
-val write : t -> 'a Data.t -> 'a array -> unit
+val write :
+  ?offset:int * int ->
+  ?size:int * int ->
+  ?pixel_spacing:int ->
+  ?line_spacing:int ->
+  t -> 'a Data.t -> 'a array -> unit
 (** [write t kind data] writes the values from [t] as [kind] values. *)
 
 val get_description : t -> string
