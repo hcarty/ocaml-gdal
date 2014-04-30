@@ -15,3 +15,10 @@ let get_long_name =
 let get_by_name =
   Lib.c "GDALGetDriverByName"
     (string @-> returning t)
+
+let get_by_name name =
+  let driver = get_by_name name in
+  if driver = null then
+    None
+  else
+    Some driver
