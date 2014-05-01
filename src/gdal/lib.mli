@@ -14,4 +14,5 @@ val register_all : unit -> unit
 (**/**)
 val c : string -> ('a -> 'b) Ctypes.fn -> 'a -> 'b
 val protect : ('a -> 'b) -> 'a -> finally:('a -> unit) -> 'b
+val convert_creation_options : string list -> unit Ctypes.ptr
 (** Internal support functions *)

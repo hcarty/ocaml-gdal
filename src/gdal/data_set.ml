@@ -85,14 +85,6 @@ let get_band =
   Lib.c "GDALGetRasterBand"
     (t @-> int @-> returning Band.t)
 
-let convert_creation_options options =
-  match options with
-  | [] -> null
-  | _ ->
-    Carray.of_list string options
-    |> Carray.start
-    |> to_voidp
-
 let create_copy =
   Lib.c "GDALCreateCopy" (
     Driver.t @->
@@ -104,7 +96,7 @@ let create_copy =
   )
 
 let create_copy ?(strict = false) ?(options = []) src driver name =
-  let options = convert_creation_options options in
+  let options = Lib.convert_creation_options options in
   let dst =
     create_copy driver name src
       (if strict then 1 else 0)
@@ -122,7 +114,7 @@ let create =
   )
 
 let create ?(options = []) driver name (nx, ny) nbands kind =
-  let options = convert_creation_options options in
+  let options = Lib.convert_creation_options options in
   create
     driver name nx ny nbands (Band.Data.to_int kind) options
 

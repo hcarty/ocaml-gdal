@@ -28,7 +28,8 @@ Library gdal
   Path:            src/gdal
   BuildDepends:    ctypes.foreign
   Pack:            true
-  Modules:         Band,
+  Modules:         Alg,
+                   Band,
                    Data_set,
                    Driver,
                    Lib

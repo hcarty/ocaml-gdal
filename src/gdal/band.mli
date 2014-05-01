@@ -16,6 +16,7 @@ module Data : sig
 
   (**/**)
   val to_int : _ t -> int
+  val to_element_t : 'a t -> 'a Ctypes.typ
   (**/**)
 end
 

@@ -21,3 +21,12 @@ let protect f x ~finally =
   let res = try f x with e -> finally x; raise e in
   finally x;
   res
+
+(* Safely convert string lists (NULL for empty lists) *)
+let convert_creation_options options =
+  match options with
+  | [] -> null
+  | _ ->
+    Array.of_list string options
+    |> Array.start
+    |> to_voidp
