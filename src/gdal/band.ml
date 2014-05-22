@@ -1,8 +1,4 @@
-module Oarray = Array
 open Ctypes
-open Foreign
-module Carray = Array
-module Array = Oarray
 
 type t = T.t
 let t = T.t
@@ -90,7 +86,7 @@ let io =
   )
 
 let io
-    ?(write : 'a std_array option)
+    ?(write : 'a array option)
     ?(offset = 0, 0)
     ?size
     ?(pixel_spacing = 0)
@@ -121,10 +117,10 @@ let io
   let c_buffer =
     match write with
     | None ->
-      Carray.make (Data.to_element_t kind) (buffer_x * buffer_y)
+      CArray.make (Data.to_element_t kind) (buffer_x * buffer_y)
     | Some buffer ->
       Array.to_list buffer
-      |> Carray.of_list (Data.to_element_t kind)
+      |> CArray.of_list (Data.to_element_t kind)
   in
   io
     t
@@ -133,7 +129,7 @@ let io
     (snd offset)
     (fst size)
     (snd size)
-    (to_voidp (Carray.start c_buffer))
+    (to_voidp (CArray.start c_buffer))
     buffer_x
     buffer_y
     (Data.to_int kind)
@@ -145,7 +141,7 @@ let read ?offset ?size ?pixel_spacing ?line_spacing ?buffer_size t kind =
   let c_array =
     io ?offset ?size ?pixel_spacing ?line_spacing ?buffer_size t kind
   in
-  Carray.to_list c_array
+  CArray.to_list c_array
   |> Array.of_list
 
 let write ?offset ?size ?pixel_spacing ?line_spacing t kind data =

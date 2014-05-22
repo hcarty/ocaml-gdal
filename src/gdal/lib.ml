@@ -27,6 +27,6 @@ let convert_creation_options options =
   match options with
   | [] -> null
   | _ ->
-    Array.of_list string options
-    |> Array.start
+    CArray.of_list string options
+    |> CArray.start
     |> to_voidp
