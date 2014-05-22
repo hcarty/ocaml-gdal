@@ -112,8 +112,8 @@ let reorder_fields =
 
 let reorder_fields t indices =
   let pointer =
-    Ctypes.Array.of_list int indices
-    |> Ctypes.Array.start
+    CArray.of_list int indices
+    |> CArray.start
   in
   reorder_fields t pointer
 
@@ -172,7 +172,7 @@ let set_ignored_fields t fields =
     | fields ->
       (* Add None at the end to signal the end of the array to OGR *)
       let fields = List.rev (None :: List.rev fields) in
-      Some (Ctypes.Array.of_list string_opt fields |> Ctypes.Array.start)
+      Some (CArray.of_list string_opt fields |> CArray.start)
   in
   set_ignored_fields t fields
 

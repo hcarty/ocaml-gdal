@@ -1,8 +1,4 @@
-module Oarray = Array
 open Ctypes
-open Foreign
-module Carray = Array
-module Array = Oarray
 
 type t = T.t
 let t = T.t
@@ -163,8 +159,8 @@ let grid_create =
   )
 
 let of_list l =
-  Carray.of_list double l
-  |> Carray.start
+  CArray.of_list double l
+  |> CArray.start
 
 let grid_create
     interpolation points
@@ -177,14 +173,14 @@ let grid_create
     ) ([], [], [], 0) points
   in
   let t = Band.Data.to_element_t data_type in
-  let c_array = Carray.make t (nx * ny) in
+  let c_array = CArray.make t (nx * ny) in
   grid_create
     interpolation.algorithm interpolation.options
     (Unsigned.UInt32.of_int npts) (of_list xs) (of_list ys) (of_list zs)
     xmin xmax ymin ymax
     (Unsigned.UInt32.of_int nx) (Unsigned.UInt32.of_int ny)
     (Band.Data.to_int data_type)
-    (c_array |> Carray.start |> to_voidp)
+    (c_array |> CArray.start |> to_voidp)
     null null;
-  Carray.to_list c_array
+  CArray.to_list c_array
   |> Array.of_list

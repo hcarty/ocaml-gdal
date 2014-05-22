@@ -1,8 +1,5 @@
-module Oarray = Array
 open Ctypes
 open Foreign
-module Carray = Array
-module Array = Oarray
 
 type t = T.t
 let t = T.t
@@ -44,9 +41,9 @@ let get_geo_transform =
     (t @-> ptr double @-> returning err)
 
 let get_geo_transform t =
-  let ca = Carray.make double 6 in
-  get_geo_transform t (Carray.start ca);
-  Array.init 6 (fun i -> Carray.get ca i)
+  let ca = CArray.make double 6 in
+  get_geo_transform t (CArray.start ca);
+  Array.init 6 (fun i -> CArray.get ca i)
 
 let origin_of_transform gt =
   gt.(0), gt.(3)
@@ -124,11 +121,11 @@ let set_geo_transform =
 
 let set_geo_transform t transform =
   assert (Array.length transform = 6);
-  let ca = Carray.make double 6 in
+  let ca = CArray.make double 6 in
   for i = 0 to 5 do
-    Carray.set ca i transform.(i);
+    CArray.set ca i transform.(i);
   done;
-  set_geo_transform t (Carray.start ca)
+  set_geo_transform t (CArray.start ca)
 
 let set_geo_transform t ~origin ~pixel_size ~rotation =
   set_geo_transform t [|
