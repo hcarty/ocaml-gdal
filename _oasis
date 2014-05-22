@@ -1,6 +1,6 @@
 OASISFormat: 0.4
 Name:        gdal
-Version:     0.2.0
+Version:     0.3.0
 Synopsis:    Bindings to the GDAL and OGR libraries
 Authors:     Hezekiah M. Carty <hez@0ok.org>
 Maintainers: Hezekiah M. Carty <hez@0ok.org>
@@ -12,7 +12,7 @@ BuildTools:  ocamlbuild
 
 Library ogr
   Path:            src/ogr
-  BuildDepends:    ctypes.foreign
+  BuildDepends:    ctypes.foreign (>= 0.3)
   Pack:            true
   Modules:         Data_source,
                    Driver,
@@ -26,7 +26,7 @@ Library ogr
 
 Library gdal
   Path:            src/gdal
-  BuildDepends:    ctypes.foreign
+  BuildDepends:    ctypes.foreign (>= 0.3)
   Pack:            true
   Modules:         Alg,
                    Band,
