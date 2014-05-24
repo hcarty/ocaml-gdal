@@ -40,6 +40,10 @@ val get_data_type : t -> [
     @return `unhandled if the data type is recognized by GDAL but unhandled by
     the OCaml bindings. *)
 
+val get_band_number : t -> int option
+(** [get_band_number t] returns the index of [t] in its dataset or [None] if
+    the index is unknown. *)
+
 val read :
   ?offset:int * int ->
   ?size:int * int ->

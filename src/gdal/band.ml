@@ -73,6 +73,15 @@ let get_data_type t =
   | 0 -> `unknown
   | _ -> `unhandled
 
+let get_band_number =
+  Lib.c "GDALGetBandNumber"
+    (t @-> returning int)
+
+let get_band_number t =
+  match get_band_number t with
+  | 0 -> None
+  | i -> Some i
+
 let io =
   Lib.c "GDALRasterIO" (
     t @->
