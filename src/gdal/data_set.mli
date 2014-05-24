@@ -87,3 +87,6 @@ val set_geo_transform :
 val set_projection : t -> string -> unit
 (** [set_project t wkt_projection] sets the projection for [t].  The projection
     string should be in WKT format. *)
+
+val of_band : Band.t -> t
+(** [of_band band] returns the {!t} associated with [band]. *)

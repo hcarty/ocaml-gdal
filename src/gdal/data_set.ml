@@ -140,3 +140,7 @@ let set_geo_transform t ~origin ~pixel_size ~rotation =
 let set_projection =
   Lib.c "GDALSetProjection"
     (t @-> string @-> returning err)
+
+let of_band =
+  Lib.c "GDALGetBandDataset"
+    (Band.t @-> returning t)
