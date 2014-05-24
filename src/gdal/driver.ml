@@ -22,3 +22,15 @@ let get_by_name name =
     None
   else
     Some driver
+
+let identify =
+  Lib.c "GDALIdentifyDriver"
+    (string @-> ptr void @-> returning t)
+
+let identify ?(options = []) name =
+  let options = Lib.convert_creation_options options in
+  let driver = identify name options in
+  if driver = null then
+    None
+  else
+    Some driver

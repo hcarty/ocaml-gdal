@@ -10,3 +10,7 @@ val get_long_name : t -> string
 val get_by_name : string -> t option
 (** [get_by_name name] returns the driver associated with [name] or [None]
     if no driver matches [name]. *)
+
+val identify : ?options:string list -> string -> t option
+(** [identify ?options name] will try to identify a driver appropriate for the
+    data source [name]. *)
