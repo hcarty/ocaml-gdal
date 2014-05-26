@@ -186,13 +186,38 @@ let set_description =
 let set_description (t, _) s = set_description t s
 
 module Block = struct
+  let get_band_size = get_size
+
   let get_size =
     Lib.c "GDALGetBlockSize"
       (t @-> ptr int @-> ptr int @-> returning void)
 
-  let get_size t =
+  let get_size (t, _) =
     let i = allocate int 0 in
     let j = allocate int 0 in
     get_size t i j;
     !@i, !@j
+
+  let get_block_count t =
+    let bandx, bandy = get_band_size t in
+    let blockx, blocky = get_size t in
+    (bandx + blockx - 1) / blockx,
+    (bandy + blocky - 1) / blocky
+
+  let read =
+    Lib.c "GDALReadBlock"
+      (t @-> int @-> int @-> ptr void @-> returning err)
+
+  let read ((c, k) as t) ~i ~j =
+    let nx, ny = get_size t in
+    let ba = Bigarray.(Array2.create k c_layout nx ny) in
+    read c i j (bigarray_start array2 ba |> to_voidp);
+    ba
+
+  let write =
+    Lib.c "GDALWriteBlock"
+      (t @-> int @-> int @-> ptr void @-> returning err)
+
+  let write (t, _) ~i ~j data =
+    write t i j (bigarray_start array2 data |> to_voidp)
 end

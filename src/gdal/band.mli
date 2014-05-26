@@ -77,9 +77,28 @@ val set_description : (_, _) t -> string -> unit
 (** [set_description t desc] sets the description of [t] to [desc]. *)
 
 module Block : sig
-  val get_size : t -> int * int
-  (** [get_size t] returns the native [(x, y)] dimensions of the blocks making
-      up [t]. *)
+  (** {2 Block IO} *)
+
+  (** These functions should generally be faster than the more generic {!read}
+      and {!write} functions. *)
+
+  val get_block_count : (_, _) t -> int * int
+  (** [get_block_count t] returns [(nx, ny)] giving the number of blocks in the
+      band's x direction ([nx]) and the number of blocks in the band's y
+      direction ([ny]). *)
+
+  val get_size : (_, _) t -> int * int
+  (** [get_size t] returns the native [(x, y)] dimensions of the individual
+      blocks making up [t]. *)
+
+  val read : ('v, 'e) t -> i:int -> j:int ->
+    ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t
+  (** [read t ~i ~j] returns the block at the [(i, j)] offset in [t]. *)
+
+  val write : ('v, 'e) t -> i:int -> j:int ->
+    ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t -> unit
+  (** [write t ~i ~j data] writes [data] to the block at the [(i, j)] offset in
+      [t]. *)
 end
 
 (**/**)
