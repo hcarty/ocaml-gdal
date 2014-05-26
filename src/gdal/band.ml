@@ -230,4 +230,65 @@ module Block = struct
 
   let write (t, _) ~i ~j data =
     write t i j (bigarray_start array2 data |> to_voidp)
+
+  let read' = read
+  let write' = write
+
+  let iter ((_c, k) as t) ~read ~write f =
+    let ni, nj = get_block_count t in
+    let nx, ny = get_size t in
+    let bandx, bandy = get_band_size t in
+    let data = Bigarray.(Array2.create k c_layout nx ny) in
+    for i = 0 to ni - 1 do
+      for j = 0 to nj - 1 do
+        let data =
+          if read then read' ~data t ~i ~j
+          else data
+        in
+        let valid, valid_x, valid_y =
+          if
+            (i + 1) * nx > bandx ||
+            (j + 1) * ny > bandy
+          then (
+            (* Only pass valid data to f *)
+            let valid_x = bandx - i * nx in
+            let valid_y = bandy - j * ny in
+            let valid =
+              Bigarray.Array2.create k Bigarray.c_layout valid_x valid_y
+            in
+            begin
+              if read then (
+                for si = 0 to valid_x - 1 do
+                  for sj = 0 to valid_y - 1 do
+                    valid.{si, sj} <- data.{si, sj}
+                  done;
+                done;
+              )
+              else (
+              )
+            end;
+            valid, valid_x, valid_y
+          )
+          else
+            data, nx, ny
+        in
+        f i j valid;
+        if write then (
+          (* If we created a fresh bigarray copy the values back to data for
+             writing. Physical equality is intentional here. *)
+          if valid != data then (
+            for si = 0 to valid_x - 1 do
+              for sj = 0 to valid_y - 1 do
+                data.{si, sj} <- valid.{si, sj}
+              done;
+            done;
+          );
+          write' t ~i ~j data;
+        );
+      done;
+    done;
+    ()
+
+  let iter_read t f = iter ~read:true ~write:false t f
+  let iter_write t f = iter ~read:false ~write:true t f
 end

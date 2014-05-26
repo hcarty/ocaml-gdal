@@ -109,6 +109,40 @@ module Block : sig
     ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t -> unit
   (** [write t ~i ~j data] writes [data] to the block at the [(i, j)] offset in
       [t]. *)
+
+  val iter :
+    ('v, 'e) t ->
+    read:bool -> write:bool ->
+    (int -> int -> ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t -> unit) ->
+    unit
+  (** [iter t ~read ~write f] applies [f] to each block in [t].  The [read]
+      and [write] arguments determine if values are from [t], written to [t] or
+      both.
+
+      @param f gets three arguments: the [i] index, [j] index and a
+      bigarray with the contents of the current block.  If [read] is [true]
+      then the bigarray will contain the current contents of the block at
+      [(i, j)].  If [write] is [true] then the contents of the bigarray will be
+      written to the block at [(i, j)] after [f] returns. *)
+
+  val iter_read :
+    ('v, 'e) t ->
+    (int -> int -> ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t -> unit) ->
+    unit
+  (** [iter_read t f] applies [f] to each block in [t].
+
+      @param f gets three arguments: the [i] index, [j] index and a
+      bigarray with the contents of the current block. *)
+
+  val iter_write :
+    ('v, 'e) t ->
+    (int -> int -> ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t -> unit) ->
+    unit
+  (** [iter_write t f] applies [f] to each block in [t].
+
+      @param f gets three arguments: the [i] index, [j] index and a
+      bigarray which should be filled with the values meant for the current
+      block. *)
 end
 
 (**/**)
