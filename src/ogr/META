@@ -1,6 +1,6 @@
 # OASIS_START
-# DO NOT EDIT (digest: 97a5642d9d8dd394b143d64a9988130c)
-version = "0.3.0"
+# DO NOT EDIT (digest: 7c140b019260f1d18c9399816ecb8a9a)
+version = "0.4.0"
 description = "Bindings to the GDAL and OGR libraries"
 requires = "ctypes.foreign"
 archive(byte) = "ogr.cma"
