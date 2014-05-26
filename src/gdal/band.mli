@@ -82,6 +82,8 @@ module Block : sig
   (** These functions should generally be faster than the more generic {!read}
       and {!write} functions. *)
 
+  exception Wrong_dimensions
+
   val get_block_count : (_, _) t -> int * int
   (** [get_block_count t] returns [(nx, ny)] giving the number of blocks in the
       band's x direction ([nx]) and the number of blocks in the band's y
@@ -91,9 +93,17 @@ module Block : sig
   (** [get_size t] returns the native [(x, y)] dimensions of the individual
       blocks making up [t]. *)
 
-  val read : ('v, 'e) t -> i:int -> j:int ->
+  val read :
+    ?data:('v, 'e, Bigarray.c_layout) Bigarray.Array2.t ->
+    ('v, 'e) t -> i:int -> j:int ->
     ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t
-  (** [read t ~i ~j] returns the block at the [(i, j)] offset in [t]. *)
+  (** [read ?data t ~i ~j] returns the block at the [(i, j)] offset in [t].
+
+      @param data will be written to and returned if it is provided, otherwise
+             a fresh {!Bigarray.Array2.t} will be allocated.  [data] must be
+             large enough to hold at least on block of values.
+      @raise Wrong_dimensions if [data] is provided and does not have enough
+             elements to hold a block. *)
 
   val write : ('v, 'e) t -> i:int -> j:int ->
     ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t -> unit

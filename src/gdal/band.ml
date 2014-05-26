@@ -186,6 +186,8 @@ let set_description =
 let set_description (t, _) s = set_description t s
 
 module Block = struct
+  exception Wrong_dimensions
+
   let get_band_size = get_size
 
   let get_size =
@@ -208,9 +210,17 @@ module Block = struct
     Lib.c "GDALReadBlock"
       (t @-> int @-> int @-> ptr void @-> returning err)
 
-  let read ((c, k) as t) ~i ~j =
+  let read ?data ((c, k) as t) ~i ~j =
     let nx, ny = get_size t in
-    let ba = Bigarray.(Array2.create k c_layout nx ny) in
+    let ba =
+      match data with
+      | None -> Bigarray.(Array2.create k c_layout nx ny)
+      | Some ba ->
+        if nx * ny <= Bigarray.Array2.dim1 ba * Bigarray.Array2.dim2 ba then
+          ba
+        else
+          raise Wrong_dimensions
+    in
     read c i j (bigarray_start array2 ba |> to_voidp);
     ba
 
