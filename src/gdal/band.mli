@@ -1,7 +1,8 @@
 (** {1 Raster Bands} *)
 
-type t
-val t : t Ctypes.typ
+type c
+type ('v, 'e) t = c * ('v, 'e) Bigarray.kind
+val t : c Ctypes.typ
 
 module Data : sig
   type ('v, 'e) t =
@@ -25,10 +26,10 @@ end
 exception IO_error
 exception Invalid_dimensions
 
-val get_size : t -> int * int
+val get_size : (_, _) t -> int * int
 (** [get_size t] returns the [(x, y)] dimensions in pixels. *)
 
-val get_data_type : t -> [
+val get_data_type : c -> [
     `byte
   | `uint16
   | `int16
@@ -45,7 +46,7 @@ val get_data_type : t -> [
     @return `unhandled if the data type is recognized by GDAL but unhandled by
     the OCaml bindings. *)
 
-val get_band_number : t -> int option
+val get_band_number : (_, _) t -> int option
 (** [get_band_number t] returns the index of [t] in its dataset or [None] if
     the index is unknown. *)
 
@@ -55,7 +56,7 @@ val read :
   ?pixel_spacing:int ->
   ?line_spacing:int ->
   ?buffer_size:int * int ->
-  t -> ('v, 'e) Data.t -> ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t
+  (_, _) t -> ('v, 'e) Data.t -> ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t
 (** [read t kind] reads the values from [t] as [kind] values. *)
 
 val write :
@@ -63,15 +64,16 @@ val write :
   ?size:int * int ->
   ?pixel_spacing:int ->
   ?line_spacing:int ->
-  t -> ('v, 'e) Data.t -> ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t ->
+  (_, _) t -> ('v, 'e) Data.t ->
+  ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t ->
   unit
 (** [write t kind data] writes the values from [t] as [kind] values. *)
 
-val get_description : t -> string
+val get_description : (_, _) t -> string
 (** [get_description t] returns the description of the current band.  If no
     description exists then the returned string will be empty. *)
 
-val set_description : t -> string -> unit
+val set_description : (_, _) t -> string -> unit
 (** [set_description t desc] sets the description of [t] to [desc]. *)
 
 module Block : sig
@@ -81,6 +83,7 @@ module Block : sig
 end
 
 (**/**)
-val get_x_size : t -> int
-val get_y_size : t -> int
+val get_x_size : (_, _) t -> int
+val get_y_size : (_, _) t -> int
+val check_data_type : c -> (_, _) Data.t -> bool
 (**/**)

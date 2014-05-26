@@ -4,6 +4,8 @@ type t
 val t : t Ctypes.typ
 (** Data set *)
 
+exception Wrong_data_type
+
 type geotransform_t
 
 val of_source : ?write:bool -> string -> [ `Invalid_source | `Ok of t ]
@@ -57,10 +59,26 @@ val get_y_size : t -> int
 val get_count : t -> int
 (** [get_count t] returns number of raster bands in [t]. *)
 
-val get_band : t -> int -> Band.t
-(** [get_band t i] returns the [i]th raster band from [t].
+val get_band : t -> int -> ('v, 'e) Band.Data.t -> ('v, 'e) Band.t
+(** [get_band t i kind] returns the [i]th raster band from [t].
 
-    @param i is 1-based, not 0-based. *)
+    @param i is 1-based, not 0-based
+    @param kind is the native data type of the band
+    @raise Wrong_data_type if [kind] is not correct *)
+
+val get_band_data_type : t -> int -> [
+    `byte
+  | `uint16
+  | `int16
+  | `uint32
+  | `int32
+  | `float32
+  | `float64
+  | `unknown
+  | `unhandled
+  ]
+(** [get_band_data_type t i] returns the native data type of the [i]th band in
+    [t]. *)
 
 val create_copy :
   ?strict:bool ->
@@ -97,5 +115,5 @@ val set_projection : t -> string -> unit
 (** [set_project t wkt_projection] sets the projection for [t].  The projection
     string should be in WKT format. *)
 
-val of_band : Band.t -> t
+val of_band : (_, _) Band.t -> t
 (** [of_band band] returns the {!t} associated with [band]. *)

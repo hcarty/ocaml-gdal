@@ -1,6 +1,7 @@
 open Ctypes
 
-type t = T.t
+type c = T.t
+type ('v, 'e) t = c * ('v, 'e) Bigarray.kind
 let t = T.t
 
 module Data = struct
@@ -37,6 +38,9 @@ module Data = struct
     | 0 -> `unknown
     | _ -> `unhandled
 
+  let is_matching_int kind i =
+    to_int kind = i
+
   let to_ba_kind : type v e. (v, e) t -> (v, e) Bigarray.kind = function
     | Byte -> Bigarray.int8_unsigned
     | UInt16 -> Bigarray.int16_unsigned
@@ -64,9 +68,13 @@ let get_x_size =
   Lib.c "GDALGetRasterBandXSize"
     (t @-> returning int)
 
+let get_x_size (t, _) = get_x_size t
+
 let get_y_size =
   Lib.c "GDALGetRasterBandYSize"
     (t @-> returning int)
+
+let get_y_size (t, _) = get_y_size t
 
 let get_size t =
   get_x_size t, get_y_size t
@@ -75,14 +83,20 @@ let get_data_type =
   Lib.c "GDALGetRasterDataType"
     (t @-> returning int)
 
-let get_data_type t =
-  Data.of_int (get_data_type t)
+let check_data_type c kind =
+  Data.is_matching_int kind (get_data_type c)
+
+let get_data_type c =
+  get_data_type c
+  |> Data.of_int
+
+let to_ba_kind (_, kind) = kind
 
 let get_band_number =
   Lib.c "GDALGetBandNumber"
     (t @-> returning int)
 
-let get_band_number t =
+let get_band_number (t, _) =
   match get_band_number t with
   | 0 -> None
   | i -> Some i
@@ -106,7 +120,7 @@ let io
     ?(pixel_spacing = 0)
     ?(line_spacing = 0)
     ?buffer_size
-    t
+    ((c, _) as t)
     (kind : ('v, 'e) Data.t)
   =
   let (x_size, y_size) as size =
@@ -139,7 +153,7 @@ let io
     | Some buffer -> buffer
   in
   io
-    t
+    c
     (if write = None then 0 else 1)
     (fst offset)
     (snd offset)
@@ -163,9 +177,13 @@ let get_description =
   Lib.c "GDALGetDescription"
     (t @-> returning string)
 
+let get_description (t, _) = get_description t
+
 let set_description =
   Lib.c "GDALSetDescription"
     (t @-> string @-> returning void)
+
+let set_description (t, _) s = set_description t s
 
 module Block = struct
   let get_size =

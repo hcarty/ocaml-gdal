@@ -5,10 +5,10 @@ val t : T.t Ctypes.typ
 
 exception Algorithm_error
 
-val proximity : ?options:string list -> src:Band.t -> test:Band.t -> unit
+val proximity : ?options:string list -> src:(_, _) Band.t -> test:(_, _) Band.t -> unit
 
 val fill_nodata :
-  target:Band.t -> mask:Band.t -> float -> int -> string list -> unit
+  target:(_, _) Band.t -> mask:(_, _) Band.t -> float -> int -> string list -> unit
 
 type interpolate_t
 

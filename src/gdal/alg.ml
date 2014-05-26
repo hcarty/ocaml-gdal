@@ -11,9 +11,9 @@ let proximity =
   Lib.c "GDALComputeProximity"
     (Band.t @-> Band.t @-> ptr void @-> ptr void @-> ptr void @-> returning err)
 
-let proximity ?(options = []) ~src ~test =
+let proximity ?(options = []) ~src:(sc, _) ~test:(tc, _) =
   let options = Lib.convert_creation_options options in
-  proximity src test options null null
+  proximity sc tc options null null
 
 let fill_nodata =
   Lib.c "GDALFillNoData" (
@@ -24,8 +24,8 @@ let fill_nodata =
     returning err
   )
 
-let fill_nodata ~target ~mask search_distance smoothing_iterations options =
-  fill_nodata target mask search_distance 0 smoothing_iterations
+let fill_nodata ~target:(tc, _) ~mask:(mc, _) search_distance smoothing_iterations options =
+  fill_nodata tc mc search_distance 0 smoothing_iterations
     (Lib.convert_creation_options options) null null
 
 type interpolate_t = {

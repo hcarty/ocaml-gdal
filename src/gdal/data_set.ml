@@ -7,6 +7,7 @@ let t = T.t
 type geotransform_t = float CArray.t
 
 exception Data_set_error
+exception Wrong_data_type
 
 let err = T.err Data_set_error
 
@@ -71,6 +72,17 @@ let get_count =
 let get_band =
   Lib.c "GDALGetRasterBand"
     (t @-> int @-> returning Band.t)
+
+let get_band_data_type t i =
+  let c = get_band t i in
+  Band.get_data_type c
+
+let get_band t i kind =
+  let c = get_band t i in
+  if Band.check_data_type c kind then
+    (c, Band.Data.to_ba_kind kind)
+  else
+    raise Wrong_data_type
 
 let create_copy =
   Lib.c "GDALCreateCopy" (
@@ -142,6 +154,9 @@ let set_projection =
 let of_band =
   Lib.c "GDALGetBandDataset"
     (Band.t @-> returning t)
+
+let of_band (band, _) =
+  of_band band
 
 let apply_geo_transform_array =
   Lib.c "GDALApplyGeoTransform"
