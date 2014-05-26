@@ -54,4 +54,5 @@ val grid_create :
   interpolate_t ->
   (float * float * float) list ->
   xrange:int * float * float ->
-  yrange:int * float * float -> 'a Band.Data.t -> 'a array
+  yrange:int * float * float -> ('v, 'e) Band.Data.t ->
+  ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t

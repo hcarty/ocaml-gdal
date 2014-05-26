@@ -4,16 +4,16 @@ type t = T.t
 let t = T.t
 
 module Data = struct
-  type _ t =
-    | Byte : int t
-    | UInt16 : int t
-    | Int16 : int t
-    | UInt32 : Unsigned.uint32 t
-    | Int32 : int32 t
-    | Float32 : float t
-    | Float64 : float t
+  type (_, _) t =
+    | Byte : (int, Bigarray.int8_unsigned_elt) t
+    | UInt16 : (int, Bigarray.int16_unsigned_elt) t
+    | Int16 : (int, Bigarray.int16_signed_elt) t
+    | UInt32 : (int32, Bigarray.int32_elt) t
+    | Int32 : (int32, Bigarray.int32_elt) t
+    | Float32 : (float, Bigarray.float32_elt) t
+    | Float64 : (float, Bigarray.float64_elt) t
 
-  let to_int : type s. s t -> int = function
+  let to_int : type v e. (v, e) t -> int = function
     | Byte -> 1
     | UInt16 -> 2
     | Int16 -> 3
@@ -22,14 +22,29 @@ module Data = struct
     | Float32 -> 6
     | Float64 -> 7
 
-  let to_element_t : type s. s t -> s typ = function
-    | Byte -> int
-    | UInt16 -> int
-    | Int16 -> int
-    | UInt32 -> uint32_t
-    | Int32 -> int32_t
-    | Float32 -> float
-    | Float64 -> double
+  let to_int_opt = function
+    | None -> 0
+    | Some x -> to_int x
+
+  let of_int = function
+    | 1 -> `byte
+    | 2 -> `uint16
+    | 3 -> `int16
+    | 4 -> `uint32
+    | 5 -> `int32
+    | 6 -> `float32
+    | 7 -> `float64
+    | 0 -> `unknown
+    | _ -> `unhandled
+
+  let to_ba_kind : type v e. (v, e) t -> (v, e) Bigarray.kind = function
+    | Byte -> Bigarray.int8_unsigned
+    | UInt16 -> Bigarray.int16_unsigned
+    | Int16 -> Bigarray.int16_signed
+    | UInt32 -> Bigarray.int32
+    | Int32 -> Bigarray.int32
+    | Float32 -> Bigarray.float32
+    | Float64 -> Bigarray.float64
 
   let byte = Byte
   let uint16 = UInt16
@@ -61,17 +76,7 @@ let get_data_type =
     (t @-> returning int)
 
 let get_data_type t =
-  let open Data in
-  match get_data_type t with
-  | 1 -> `int Byte
-  | 2 -> `int UInt16
-  | 3 -> `int Int16
-  | 4 -> `uint32 UInt32
-  | 5 -> `int32 Int32
-  | 6 -> `float Float32
-  | 7 -> `float Float64
-  | 0 -> `unknown
-  | _ -> `unhandled
+  Data.of_int (get_data_type t)
 
 let get_band_number =
   Lib.c "GDALGetBandNumber"
@@ -95,14 +100,14 @@ let io =
   )
 
 let io
-    ?(write : 'a array option)
+    ?(write : ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t option)
     ?(offset = 0, 0)
     ?size
     ?(pixel_spacing = 0)
     ?(line_spacing = 0)
     ?buffer_size
     t
-    (kind : 'a Data.t)
+    (kind : ('v, 'e) Data.t)
   =
   let (x_size, y_size) as size =
     match size with
@@ -118,18 +123,20 @@ let io
     match write with
     | None -> bx, by
     | Some a ->
-      if bx * by <= Array.length a then
+      if
+        bx = Bigarray.Array2.dim1 a &&
+        by = Bigarray.Array2.dim2 a
+      then
         bx, by
       else
         raise Invalid_dimensions
   in
-  let c_buffer =
+  let ba =
     match write with
     | None ->
-      CArray.make (Data.to_element_t kind) (buffer_x * buffer_y)
-    | Some buffer ->
-      Array.to_list buffer
-      |> CArray.of_list (Data.to_element_t kind)
+      let open Bigarray in
+      Array2.create (Data.to_ba_kind kind) c_layout buffer_x buffer_y
+    | Some buffer -> buffer
   in
   io
     t
@@ -138,20 +145,16 @@ let io
     (snd offset)
     (fst size)
     (snd size)
-    (to_voidp (CArray.start c_buffer))
+    (bigarray_start array2 ba |> to_voidp)
     buffer_x
     buffer_y
     (Data.to_int kind)
     pixel_spacing
     line_spacing;
-  c_buffer
+  ba
 
 let read ?offset ?size ?pixel_spacing ?line_spacing ?buffer_size t kind =
-  let c_array =
-    io ?offset ?size ?pixel_spacing ?line_spacing ?buffer_size t kind
-  in
-  CArray.to_list c_array
-  |> Array.of_list
+  io ?offset ?size ?pixel_spacing ?line_spacing ?buffer_size t kind
 
 let write ?offset ?size ?pixel_spacing ?line_spacing t kind data =
   ignore (io ~write:data ?offset ?size ?pixel_spacing ?line_spacing t kind)

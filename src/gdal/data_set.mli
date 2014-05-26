@@ -4,6 +4,8 @@ type t
 val t : t Ctypes.typ
 (** Data set *)
 
+type geotransform_t
+
 val of_source : ?write:bool -> string -> [ `Invalid_source | `Ok of t ]
 (** [of_source ?write name] opens the source [name] for access.
 
@@ -35,13 +37,17 @@ val get_projection : t -> string
 (** [get_projection t] returns a string representing the projection applied to
     [t]. *)
 
-val get_origin : t -> float * float
+val get_geo_transform : t -> geotransform_t
+(** [get_geo_transform t] returns the geotransform array associated with
+    [t]. *)
+
+val get_origin : geotransform_t -> float * float
 (** [get_origin t] returns the [(x, y)] origin of rasters in [t]. *)
 
-val get_pixel_size : t -> float * float
+val get_pixel_size : geotransform_t -> float * float
 (** [get_pixel_size t] returns the [(x, y)] pixel size of the rasters in [t]. *)
 
-val get_rotation : t -> float * float
+val get_rotation : geotransform_t -> float * float
 (** [get_rotation t] returns the rotation of rasters in [t]. *)
 
 val get_x_size : t -> int
@@ -67,22 +73,25 @@ val create_copy :
 
 val create :
   ?options:string list ->
-  Driver.t -> string -> int * int -> int -> 'a Band.Data.t -> t
-(** [create ?options driver name size bands kind] creates a new {!t} with the
+  ?bands:int * (_, _) Band.Data.t ->
+  Driver.t -> string -> int * int -> t
+(** [create ?options ?bands driver name size] creates a new {!t} with the
     given specifications.
 
     @param size specifies the [(x, y)] dimensions of bands in pixels
-    @param bands specifies the number of bands in the data set
-    @param kind specifies the data type used to store data internally *)
+    @param bands specifies the number of bands to initialize in the data set
+           and their data type *)
 
-val set_geo_transform :
-  t ->
+val make_geo_transform :
   origin:float * float ->
   pixel_size:float * float ->
   rotation:float * float ->
-  unit
-(** [set_geo_transform t ~origin ~pixel_size ~rotation] sets the geotransform
-    data for [t]. *)
+  geotransform_t
+(** [make_geo_transform ~origin ~pixel_size ~rotation] creates a geotransform
+    with the given specifications. *)
+
+val set_geo_transform : t -> geotransform_t -> unit
+(** [set_geo_transform_array t] sets the geotransform array for [t]. *)
 
 val set_projection : t -> string -> unit
 (** [set_project t wkt_projection] sets the projection for [t].  The projection

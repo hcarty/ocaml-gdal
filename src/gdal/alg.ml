@@ -172,15 +172,16 @@ let grid_create
         x :: xs, y :: ys, z :: zs, succ npts
     ) ([], [], [], 0) points
   in
-  let t = Band.Data.to_element_t data_type in
-  let c_array = CArray.make t (nx * ny) in
+  let ba =
+    let open Bigarray in
+    Array2.create (Band.Data.to_ba_kind data_type) c_layout nx ny
+  in
   grid_create
     interpolation.algorithm interpolation.options
     (Unsigned.UInt32.of_int npts) (of_list xs) (of_list ys) (of_list zs)
     xmin xmax ymin ymax
     (Unsigned.UInt32.of_int nx) (Unsigned.UInt32.of_int ny)
     (Band.Data.to_int data_type)
-    (c_array |> CArray.start |> to_voidp)
+    (bigarray_start array2 ba |> to_voidp)
     null null;
-  CArray.to_list c_array
-  |> Array.of_list
+  ba

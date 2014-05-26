@@ -4,19 +4,21 @@ type t
 val t : t Ctypes.typ
 
 module Data : sig
-  type 'a t
+  type ('v, 'e) t =
+    | Byte : (int, Bigarray.int8_unsigned_elt) t
+    | UInt16 : (int, Bigarray.int16_unsigned_elt) t
+    | Int16 : (int, Bigarray.int16_signed_elt) t
+    | UInt32 : (int32, Bigarray.int32_elt) t
+    | Int32 : (int32, Bigarray.int32_elt) t
+    | Float32 : (float, Bigarray.float32_elt) t
+    | Float64 : (float, Bigarray.float64_elt) t
 
-  val byte : int t
-  val uint16 : int t
-  val int16 : int t
-  val uint32 : Unsigned.uint32 t
-  val int32 : int32 t
-  val float32 : float t
-  val float64 : float t
+  val to_ba_kind : ('v, 'e) t -> ('v, 'e) Bigarray.kind
+  (** [to_ba_kind t] returns the {!Bigarray.kind} matching [t]. *)
 
   (**/**)
-  val to_int : _ t -> int
-  val to_element_t : 'a t -> 'a Ctypes.typ
+  val to_int : (_, _) t -> int
+  val to_int_opt : (_, _) t option -> int
   (**/**)
 end
 
@@ -27,10 +29,13 @@ val get_size : t -> int * int
 (** [get_size t] returns the [(x, y)] dimensions in pixels. *)
 
 val get_data_type : t -> [
-    `int of int Data.t
-  | `uint32 of Unsigned.uint32 Data.t
-  | `int32 of int32 Data.t
-  | `float of float Data.t
+    `byte
+  | `uint16
+  | `int16
+  | `uint32
+  | `int32
+  | `float32
+  | `float64
   | `unknown
   | `unhandled
   ]
@@ -50,7 +55,7 @@ val read :
   ?pixel_spacing:int ->
   ?line_spacing:int ->
   ?buffer_size:int * int ->
-  t -> 'a Data.t -> 'a array
+  t -> ('v, 'e) Data.t -> ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t
 (** [read t kind] reads the values from [t] as [kind] values. *)
 
 val write :
@@ -58,7 +63,8 @@ val write :
   ?size:int * int ->
   ?pixel_spacing:int ->
   ?line_spacing:int ->
-  t -> 'a Data.t -> 'a array -> unit
+  t -> ('v, 'e) Data.t -> ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t ->
+  unit
 (** [write t kind data] writes the values from [t] as [kind] values. *)
 
 val get_description : t -> string

@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 470d07ad43018e0f2f3e8ced11b1632a)
+# DO NOT EDIT (digest: 954fa6bc5f7b506951634c00716ee94a)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -33,6 +33,7 @@
 "src/gdal/driver.cmx": for-pack(Gdal)
 "src/gdal/lib.cmx": for-pack(Gdal)
 "src/gdal/t.cmx": for-pack(Gdal)
+<src/gdal/*.ml{,i}>: pkg_bigarray
 <src/gdal/*.ml{,i}>: pkg_ctypes.foreign
 # Executable sanity
 <examples/sanity.{native,byte}>: pkg_ctypes.foreign
