@@ -110,6 +110,9 @@ val iter_write : ('v, _) t -> (int -> int -> 'v) -> unit
     @param f gets three arguments: [i], [j] for the pixel offset within the
     band. *)
 
+val fold : ('v, _) t -> (int -> int -> 'v -> 'accu -> 'accu) -> 'accu -> 'accu
+(** [fold t f init] folds over the pixels in [t] with [f]. *)
+
 module Block : sig
   (** {2 Block IO} *)
 

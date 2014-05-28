@@ -373,3 +373,11 @@ let iter_write t f =
       done;
       ()
   )
+
+let fold t f init =
+  let accu = ref init in
+  iter_read t (
+    fun i j v ->
+      accu := f i j v !accu
+  );
+  !accu
