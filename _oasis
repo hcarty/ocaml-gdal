@@ -33,6 +33,7 @@ Library gdal
                    Band,
                    Data_set,
                    Driver,
+                   Geo_transform,
                    Lib
   InternalModules: T
 
