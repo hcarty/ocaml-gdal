@@ -69,12 +69,46 @@ val write :
   unit
 (** [write t kind data] writes the values from [t] as [kind] values. *)
 
+val fill : ?imaginary:float -> (_, _) t -> float -> unit
+(** [file ?imaginary t real] sets all values in [t] to [real].  If [t] holds
+    complex numbers then [imaginary] can be specified as well.
+
+    @param imaginary defaults to [0.0]. *)
+
 val get_description : (_, _) t -> string
 (** [get_description t] returns the description of the current band.  If no
     description exists then the returned string will be empty. *)
 
+val get_no_data_value : (_, _) t -> float option
+(** [get_no_data_value t] returns the value representing no/missing data in
+    band [t], or [None] if no such value is set. *)
+
 val set_description : (_, _) t -> string -> unit
 (** [set_description t desc] sets the description of [t] to [desc]. *)
+
+val set_no_data_value : (_, _) t -> float -> unit
+(** [set_no_data_value t x] defines [x] as representing no/missing data in
+    band [t]. *)
+
+val iter : ('v, _) t -> (int -> int -> 'v -> 'v) -> unit
+(** [iter t f] applies [f] to every value in [t] then assigns the result back
+    to the same point in [t].
+
+    @param f gets three arguments: [i], [j] and the [v]alue at this location
+    in the band. *)
+
+val iter_read : ('v, _) t -> (int -> int -> 'v -> unit) -> unit
+(** [iter_read t f] calls [f] with every value in [t].
+
+    @param f gets three arguments: [i], [j] for the pixel offset within the
+    band and the [v]alue at this offset. *)
+
+val iter_write : ('v, _) t -> (int -> int -> 'v) -> unit
+(** [iter_read t f] calls [f] with every pixel offset in [t].  The result of
+    [f] is written back to [t] at the current offset.
+
+    @param f gets three arguments: [i], [j] for the pixel offset within the
+    band. *)
 
 module Block : sig
   (** {2 Block IO} *)

@@ -173,17 +173,43 @@ let read ?offset ?size ?pixel_spacing ?line_spacing ?buffer_size t kind =
 let write ?offset ?size ?pixel_spacing ?line_spacing t kind data =
   ignore (io ~write:data ?offset ?size ?pixel_spacing ?line_spacing t kind)
 
+let fill =
+  Lib.c "GDALFillRaster"
+    (t @-> double @-> double @-> returning err)
+
+let fill ?(imaginary = 0.0) (t, _) real =
+  fill t real imaginary
+
 let get_description =
   Lib.c "GDALGetDescription"
     (t @-> returning string)
 
 let get_description (t, _) = get_description t
 
+let get_no_data_value =
+  Lib.c "GDALGetRasterNoDataValue"
+    (t @-> ptr int @-> returning double)
+
+let get_no_data_value (t, _) =
+  let ok = allocate int 0 in
+  let result = get_no_data_value t ok in
+  if to_voidp ok = null || !@ok = 1 then
+    Some result
+  else
+    None
+
 let set_description =
   Lib.c "GDALSetDescription"
     (t @-> string @-> returning void)
 
 let set_description (t, _) s = set_description t s
+
+let set_no_data_value =
+  Lib.c "GDALSetRasterNoDataValue"
+    (t @-> double @-> returning err)
+
+let set_no_data_value (t, _) x =
+  set_no_data_value t x
 
 module Block = struct
   exception Wrong_dimensions
@@ -292,3 +318,58 @@ module Block = struct
   let iter_read t f = iter ~read:true ~write:false t f
   let iter_write t f = iter ~read:false ~write:true t f
 end
+
+let iter t f =
+  let block_x_size, block_y_size = Block.get_size t in
+  Block.iter t ~read:true ~write:true (
+    fun block_i block_j data ->
+      let open Bigarray in
+      let ni = Array2.dim1 data in
+      let nj = Array2.dim2 data in
+      for data_i = 0 to ni - 1 do
+        for data_j = 0 to nj - 1 do
+          let i = block_i * block_x_size + data_i in
+          let j = block_j * block_y_size + data_j in
+          let v = data.{data_i, data_j} in
+          let result = f i j v in
+          data.{data_i, data_j} <- result;
+        done;
+      done;
+      ()
+  )
+
+let iter_read t f =
+  let block_x_size, block_y_size = Block.get_size t in
+  Block.iter t ~read:true ~write:false (
+    fun block_i block_j data ->
+      let open Bigarray in
+      let ni = Array2.dim1 data in
+      let nj = Array2.dim2 data in
+      for data_i = 0 to ni - 1 do
+        for data_j = 0 to nj - 1 do
+          let i = block_i * block_x_size + data_i in
+          let j = block_j * block_y_size + data_j in
+          let v = data.{data_i, data_j} in
+          f i j v;
+        done;
+      done;
+      ()
+  )
+
+let iter_write t f =
+  let block_x_size, block_y_size = Block.get_size t in
+  Block.iter t ~read:false ~write:true (
+    fun block_i block_j data ->
+      let open Bigarray in
+      let ni = Array2.dim1 data in
+      let nj = Array2.dim2 data in
+      for data_i = 0 to ni - 1 do
+        for data_j = 0 to nj - 1 do
+          let i = block_i * block_x_size + data_i in
+          let j = block_j * block_y_size + data_j in
+          let result = f i j in
+          data.{data_i, data_j} <- result;
+        done;
+      done;
+      ()
+  )
