@@ -5,9 +5,13 @@ let t = T.t
 
 exception Invalid_projection
 exception Band_error
+exception Copy_error
+exception Overview_error
 
 let proj_err = T.err Invalid_projection
 let band_err = T.err Band_error
+let copy_err = T.err Copy_error
+let overview_err = T.err Overview_error
 
 let open_ = (* 'open' is a keyword in OCaml *)
   Lib.c "GDALOpen"
@@ -116,6 +120,13 @@ let create ?(options = []) ?bands driver name (nx, ny) =
   else
     `Ok ds
 
+let copy =
+  Lib.c "GDALDatasetCopyWholeRaster"
+    (t @-> t @-> ptr void @-> ptr void @-> ptr void @-> returning copy_err)
+
+let copy ?(options = []) ~src ~dst =
+  copy src dst (Lib.convert_creation_options options) null null
+
 let set_projection =
   Lib.c "GDALSetProjection"
     (t @-> string @-> returning proj_err)
@@ -126,3 +137,27 @@ let of_band =
 
 let of_band (band, _) =
   of_band band
+
+let build_overviews =
+  Lib.c "GDALBuildOverviews"
+    (string @-> int @-> ptr int @-> int @-> ptr int @-> ptr void @-> ptr void
+     @-> returning overview_err)
+
+let build_overviews ?factors ?bands t resampling =
+  let n_factors, factors =
+    match factors with
+    | None
+    | Some [] -> 0, null |> from_voidp int
+    | Some f ->
+      let ca = CArray.of_list int f in
+      CArray.length ca, CArray.start ca
+  in
+  let n_bands, bands =
+    match bands with
+    | None
+    | Some [] -> 0, null |> from_voidp int
+    | Some b ->
+      let ca = CArray.of_list int b in
+      CArray.length ca, CArray.start ca
+  in
+  build_overviews resampling n_factors factors n_bands bands null null

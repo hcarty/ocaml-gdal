@@ -6,6 +6,8 @@ val t : t Ctypes.typ
 
 exception Invalid_projection
 exception Band_error
+exception Copy_error
+exception Overview_error
 
 val of_source :
   ?write:bool ->
@@ -92,9 +94,20 @@ val create :
     @param bands specifies the number of bands to initialize in the data set
            and their data type *)
 
+val copy : ?options:string list -> src:t -> dst:t -> unit
+(** [copy ?options ~src ~dst] efficiently copies data from [src] to [dst].
+    Number and dimensions of the included bands must match.  The data types of
+    each band do not need to match. *)
+
 val set_projection : t -> string -> unit
 (** [set_project t wkt_projection] sets the projection for [t].  The projection
     string should be in WKT format. *)
 
 val of_band : (_, _) Band.t -> t
 (** [of_band band] returns the {!t} associated with [band]. *)
+
+val build_overviews :
+  ?factors:int list -> ?bands:int list -> t -> string -> unit
+(** [build_overviews ?factors ?bands t resampling] builds overviews for [t] on
+    bands [bands] using decimation factors [factors] with resampling method
+    [resampling]. *)
