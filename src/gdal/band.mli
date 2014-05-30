@@ -125,6 +125,24 @@ module Block : sig
 
   exception Wrong_dimensions
 
+  type offset_t = {
+    block : int * int;
+    offset : int * int;
+  }
+
+  val make_block_offset : block:int * int -> offset:int * int -> offset_t
+
+  val pixel_of_block_offset : (_, _) t -> (offset_t -> int * int)
+  (** [pixel_of_block_offset t] returns a function which may be used to convert
+      offsets within a block to pixel offsets within the band [t].
+
+      @return f: A function which, given a block index [block] and an offset
+      within that block [offset] returns the index of the matching pixel. *)
+
+  val block_of_pixel_offset : (_, _) t -> (int -> int -> offset_t)
+  (** [block_of_pixel_offset t] returns a function which returns the
+      {!block_offset_t} matching the pixel offset provided. *)
+
   val get_block_count : (_, _) t -> int * int
   (** [get_block_count t] returns [(nx, ny)] giving the number of blocks in the
       band's x direction ([nx]) and the number of blocks in the band's y

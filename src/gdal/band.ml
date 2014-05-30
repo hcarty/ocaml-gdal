@@ -221,6 +221,14 @@ let copy ?(options = []) ~src:(s, _) ~dst:(d, _) =
 module Block = struct
   exception Wrong_dimensions
 
+  type offset_t = {
+    block : int * int;
+    offset : int * int;
+  }
+
+  let make_block_offset ~block ~offset =
+    { block; offset }
+
   let get_band_size = get_size
 
   let get_size =
@@ -232,6 +240,25 @@ module Block = struct
     let j = allocate int 0 in
     get_size t i j;
     !@i, !@j
+
+  let pixel_of_block_offset t =
+    let block_x_size, block_y_size = get_size t in
+    fun { block = (i_block, j_block); offset = (i, j) } ->
+      let i_pixel = i_block * block_x_size + i in
+      let j_pixel = j_block * block_y_size + j in
+      i_pixel, j_pixel
+
+  let block_of_pixel_offset t =
+    let block_x_size, block_y_size = get_size t in
+    fun i j ->
+      let i_block = i / block_x_size in
+      let j_block = j / block_y_size in
+      let i_offset = i mod block_x_size in
+      let j_offset = j mod block_y_size in
+      {
+        block = i_block, j_block;
+        offset = i_offset, j_offset;
+      }
 
   let get_block_count t =
     let bandx, bandy = get_band_size t in
