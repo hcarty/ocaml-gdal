@@ -4,9 +4,13 @@ type t
 val t : t Ctypes.typ
 (** Data set *)
 
-exception Wrong_data_type
+exception Invalid_projection
+exception Band_error
 
-val of_source : ?write:bool -> string -> [ `Invalid_source | `Ok of t ]
+val of_source :
+  ?write:bool ->
+  string ->
+  [ `Error of [> `Invalid_source ] | `Ok of t ]
 (** [of_source ?write name] opens the source [name] for access.
 
     @param write defaults to false (read-only)
@@ -21,8 +25,7 @@ val close : t -> unit
 val with_source :
   ?write:bool ->
   string ->
-  (t -> 'a) ->
-  [ `Invalid_source | `Ok of 'a ]
+  (t -> ([> `Error of [> `Invalid_source ] ] as 'a)) -> 'a
 (** [with_source ?write name f] opens [name] and calls [f src] if [name] is a
     valid data source.  The data source passed to [f] will be closed if [f]
     returns normally or raises an exception.
@@ -65,11 +68,14 @@ val get_band_data_type : t -> int -> [
 (** [get_band_data_type t i] returns the native data type of the [i]th band in
     [t]. *)
 
+val add_band : ?options:string list -> t -> ('v, 'e) Band.Data.t -> unit
+(** [add_band ?options t kind] adds a band of type [kind] to [t]. *)
+
 val create_copy :
   ?strict:bool ->
   ?options:string list ->
   t -> Driver.t -> string ->
-  [ `Invalid_source | `Ok of t ]
+  [ `Error of [ `Invalid_source ] | `Ok of t ]
 (** [create_copy ?strict ?options t driver name] creates a copy of [t].
 
     @param driver specifies the driver to use for the copy. *)
@@ -77,13 +83,15 @@ val create_copy :
 val create :
   ?options:string list ->
   ?bands:int * (_, _) Band.Data.t ->
-  Driver.t -> string -> int * int -> t
+  Driver.t -> string -> int * int ->
+  [ `Error of [ `Invalid_source ] | `Ok of t ]
 (** [create ?options ?bands driver name size] creates a new {!t} with the
     given specifications.
 
     @param size specifies the [(x, y)] dimensions of bands in pixels
     @param bands specifies the number of bands to initialize in the data set
            and their data type *)
+
 val set_projection : t -> string -> unit
 (** [set_project t wkt_projection] sets the projection for [t].  The projection
     string should be in WKT format. *)

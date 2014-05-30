@@ -3,10 +3,11 @@ open Ctypes
 type t = T.t
 let t = T.t
 
-exception Data_set_error
-exception Wrong_data_type
+exception Invalid_projection
+exception Band_error
 
-let err = T.err Data_set_error
+let proj_err = T.err Invalid_projection
+let band_err = T.err Band_error
 
 let open_ = (* 'open' is a keyword in OCaml *)
   Lib.c "GDALOpen"
@@ -19,14 +20,14 @@ let close =
 let of_source ?(write = false) name =
   let h = open_ name (if write then 1 else 0) in
   if h = null then
-    `Invalid_source
+    `Error `Invalid_source
   else
     `Ok h
 
 let with_source ?write name f =
   match of_source ?write name with
-  | `Ok h -> `Ok (Lib.protect f h ~finally:close)
-  | `Invalid_source -> `Invalid_source
+  | `Ok h -> Lib.protect f h ~finally:close
+  | `Error _ as e -> e
 
 let get_driver =
   Lib.c "GDALGetDatasetDriver"
@@ -61,7 +62,15 @@ let get_band t i kind =
   if Band.check_data_type c kind then
     (c, Band.Data.to_ba_kind kind)
   else
-    raise Wrong_data_type
+    invalid_arg "get_band"
+
+let add_band =
+  Lib.c "GDALAddBand"
+    (t @-> int @-> ptr void @-> returning band_err)
+
+let add_band ?(options = []) t kind =
+  let i = Band.Data.to_int kind in
+  add_band t i (Lib.convert_creation_options options)
 
 let create_copy =
   Lib.c "GDALCreateCopy" (
@@ -81,7 +90,7 @@ let create_copy ?(strict = false) ?(options = []) src driver name =
       options null null
   in
   if dst = null then
-    `Invalid_source
+    `Error `Invalid_source
   else
     `Ok dst
 
@@ -98,12 +107,18 @@ let create ?(options = []) ?bands driver name (nx, ny) =
     | Some (n, kind) -> n, Some kind
   in
   let options = Lib.convert_creation_options options in
-  create
-    driver name nx ny nbands (Band.Data.to_int_opt kind) options
+  let ds =
+    create
+      driver name nx ny nbands (Band.Data.to_int_opt kind) options
+  in
+  if ds = null then
+    `Error `Invalid_source
+  else
+    `Ok ds
 
 let set_projection =
   Lib.c "GDALSetProjection"
-    (t @-> string @-> returning err)
+    (t @-> string @-> returning proj_err)
 
 let of_band =
   Lib.c "GDALGetBandDataset"
