@@ -11,6 +11,20 @@ val register_all : unit -> unit
 
     {!all_register} is an alias to match the GDAL C API spelling. *)
 
+val check_version : ?caller:string -> major:int -> minor:int -> bool
+(** [check_version ~major ~minor] returns [true] if the loaded GDAL version
+    matches [major.minor]. *)
+
+val set_cache_max : int64 -> unit
+(** [set_cache_max bytes] sets the maximum cache size in bytes used by GDAL for
+    raster block IO. *)
+
+val get_cache_max : unit -> int64
+(** [get_cache_max ()] returns the maximum block IO cache size in bytes. *)
+
+val get_cache_used : unit -> int64
+(** [get_cache_used ()] returns the number of bytes in GDAL's IO cache. *)
+
 (**/**)
 val c : string -> ('a -> 'b) Ctypes.fn -> 'a -> 'b
 val protect : ('a -> 'b) -> 'a -> finally:('a -> unit) -> 'b

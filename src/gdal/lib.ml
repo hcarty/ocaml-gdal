@@ -30,3 +30,22 @@ let convert_creation_options options =
     CArray.of_list string options
     |> CArray.start
     |> to_voidp
+
+let set_cache_max =
+  c "GDALSetCacheMax64"
+    (int64_t @-> returning void)
+
+let get_cache_max =
+  c "GDALGetCacheMax64"
+    (void @-> returning int64_t)
+
+let get_cache_used =
+  c "GDALGetCacheUsed64"
+    (void @-> returning int64_t)
+
+let check_version =
+  c "GDALCheckVersion"
+    (int @-> int @-> string_opt @-> returning int)
+
+let check_version ?caller ~major ~minor =
+  check_version major minor caller <> 0
