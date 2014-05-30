@@ -113,6 +113,10 @@ val iter_write : ('v, _) t -> (int -> int -> 'v) -> unit
 val fold : ('v, _) t -> (int -> int -> 'v -> 'accu -> 'accu) -> 'accu -> 'accu
 (** [fold t f init] folds over the pixels in [t] with [f]. *)
 
+val copy : ?options:string list -> src:(_, _) t -> dst:(_, _) t -> unit
+(** [copy ?options ~src ~dst] copies the contents of [src] to [dst].  GDAL will
+    perform any data conversion necessary. *)
+
 module Block : sig
   (** {2 Block IO} *)
 

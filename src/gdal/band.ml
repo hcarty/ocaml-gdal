@@ -211,6 +211,13 @@ let set_no_data_value =
 let set_no_data_value (t, _) x =
   set_no_data_value t x
 
+let copy =
+  Lib.c "GDALRasterBandCopyWholeRaster"
+    (t @-> t @-> ptr void @-> ptr void @-> ptr void @-> returning err)
+
+let copy ?(options = []) ~src:(s, _) ~dst:(d, _) =
+  copy s d (Lib.convert_creation_options options) null null
+
 module Block = struct
   exception Wrong_dimensions
 
