@@ -84,7 +84,7 @@ let get_data_type =
     (t @-> returning int)
 
 let check_data_type c kind =
-  Data.is_matching_int kind (get_data_type c)
+  c <> null && Data.is_matching_int kind (get_data_type c)
 
 let get_data_type c =
   get_data_type c
