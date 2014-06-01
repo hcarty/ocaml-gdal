@@ -2,6 +2,7 @@
 
 type t
 val t : t Ctypes.typ
+val t_opt : t option Ctypes.typ
 (** Data set *)
 
 exception Invalid_projection

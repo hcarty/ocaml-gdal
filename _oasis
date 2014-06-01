@@ -34,7 +34,8 @@ Library gdal
                    Data_set,
                    Driver,
                    Geo_transform,
-                   Lib
+                   Lib,
+                   Transform
   InternalModules: T
 
 Flag examples

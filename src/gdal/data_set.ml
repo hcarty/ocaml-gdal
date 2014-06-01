@@ -3,6 +3,8 @@ open Ctypes
 type t = T.t
 let t = T.t
 
+let t_opt = T.t_opt
+
 exception Invalid_projection
 exception Band_error
 exception Copy_error
