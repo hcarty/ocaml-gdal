@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 69b3a0c804308943f7636e90629b23cd)
+# DO NOT EDIT (digest: 0a88ab873a87a611525eec008b91af74)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -35,6 +35,7 @@
 "src/gdal/lib.cmx": for-pack(Gdal)
 "src/gdal/transform.cmx": for-pack(Gdal)
 "src/gdal/t.cmx": for-pack(Gdal)
+"src/gdal/warp.cmx": for-pack(Gdal)
 <src/gdal/*.ml{,i}>: pkg_bigarray
 <src/gdal/*.ml{,i}>: pkg_ctypes.foreign
 # Executable sanity
