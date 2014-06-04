@@ -17,7 +17,7 @@ val make_gen_img :
 (** [make_gen_img ?gcp ~src ~dst] creates a transformation definition between
     the coordinate system of [src] and [dst].
 
-    @param gcp defaults to [(true, 0)].  See GDAL's
+    @param gcp defaults to [(false, 0)].  See GDAL's
     [GDALCreateGenImgProjTransformer] documentation for an explanation of how
     GCPs may be used. *)
 
