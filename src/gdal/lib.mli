@@ -25,6 +25,14 @@ val get_cache_max : unit -> int64
 val get_cache_used : unit -> int64
 (** [get_cache_used ()] returns the number of bytes in GDAL's IO cache. *)
 
+val set_config_option : string -> string option -> unit
+(** [set_config_option key value] sets the global configuration option for
+    [key] to [value].  If [value] is [None] then [key] is cleared. *)
+
+val get_config_option : ?default:string -> string -> string option
+(** [get_config_option ?default key] returns the value associated with [key].
+    If no value is associated with [key] then [default] is returned. *)
+
 (**/**)
 val c : string -> ('a -> 'b) Ctypes.fn -> 'a -> 'b
 val protect : ('a -> 'b) -> 'a -> finally:('a -> unit) -> 'b

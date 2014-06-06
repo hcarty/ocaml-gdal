@@ -49,3 +49,14 @@ let check_version =
 
 let check_version ?caller ~major ~minor =
   check_version major minor caller <> 0
+
+let set_config_option =
+  c "CPLSetConfigOption"
+    (string @-> string_opt @-> returning void)
+
+let get_config_option =
+  c "CPLGetConfigOption"
+    (string @-> string_opt @-> returning string_opt)
+
+let get_config_option ?default key =
+  get_config_option key default
