@@ -1,6 +1,6 @@
 OASISFormat: 0.4
 Name:        gdal
-Version:     0.4.0
+Version:     0.6.1
 Synopsis:    Bindings to the GDAL and OGR libraries
 Authors:     Hezekiah M. Carty <hez@0ok.org>
 Maintainers: Hezekiah M. Carty <hez@0ok.org>
