@@ -5,6 +5,7 @@ let t = T.t
 
 let t_opt = T.t_opt
 
+exception Invalid_source
 exception Invalid_projection
 exception Band_error
 exception Copy_error
@@ -30,10 +31,19 @@ let of_source ?(write = false) name =
   else
     `Ok h
 
+let of_source_exn ?write name =
+  match of_source ?write name with
+  | `Ok o -> o
+  | `Error _ -> raise Invalid_source
+
 let with_source ?write name f =
   match of_source ?write name with
   | `Ok h -> Lib.protect f h ~finally:close
   | `Error _ as e -> e
+
+let with_source_exn ?write name f =
+  let h = of_source_exn ?write name in
+  Lib.protect f h ~finally:close
 
 let get_driver =
   Lib.c "GDALGetDatasetDriver"
@@ -100,6 +110,11 @@ let create_copy ?(strict = false) ?(options = []) src driver name =
   else
     `Ok dst
 
+let create_copy_exn ?strict ?options src driver name =
+  match create_copy ?strict ?options src driver name with
+  | `Ok c -> c
+  | `Error _ -> raise Invalid_source
+
 let create =
   Lib.c "GDALCreate" (
     Driver.t @-> string @-> int @-> int @-> int @-> int @-> ptr void @->
@@ -121,6 +136,11 @@ let create ?(options = []) ?bands driver name (nx, ny) =
     `Error `Invalid_source
   else
     `Ok ds
+
+let create_exn ?options ?bands driver name (nx, ny) =
+  match create ?options ?bands driver name (nx, ny) with
+  | `Ok c -> c
+  | `Error _ -> raise Invalid_source
 
 let copy =
   Lib.c "GDALDatasetCopyWholeRaster"

@@ -5,6 +5,7 @@ val t : t Ctypes.typ
 val t_opt : t option Ctypes.typ
 (** Data set *)
 
+exception Invalid_source
 exception Invalid_projection
 exception Band_error
 exception Copy_error
@@ -22,6 +23,10 @@ val of_source :
 
     @return `Invalid_source if [name] does not represent a valid data source. *)
 
+val of_source_exn : ?write:bool -> string -> t
+(** Like {!of_source} except that this function raises {!Invalid_source} if
+    there is an error. *)
+
 val close : t -> unit
 (** [close t] closes the data set [t]. *)
 
@@ -35,6 +40,10 @@ val with_source :
 
     This is a wrapper around {!of_source}.  See its documentation for a
     description of the expected arguments. *)
+
+val with_source_exn : ?write:bool -> string -> (t -> 'a) -> 'a
+(** Like {!with_source} except that this function raises {!Invalid_source}
+    if there is an error when trying to open the data source. *)
 
 val get_driver : t -> Driver.t
 (** [get_driver t] returns the driver associated with [t]. *)
@@ -83,6 +92,11 @@ val create_copy :
 
     @param driver specifies the driver to use for the copy. *)
 
+val create_copy_exn :
+  ?strict:bool -> ?options:string list -> t -> Driver.t -> string -> t
+(** Like {!create_copy} except that the function raises {!Invalid_source} if
+    there is an error. *)
+
 val create :
   ?options:string list ->
   ?bands:int * (_, _) Band.Data.t ->
@@ -94,6 +108,13 @@ val create :
     @param size specifies the [(x, y)] dimensions of bands in pixels
     @param bands specifies the number of bands to initialize in the data set
            and their data type *)
+
+val create_exn :
+  ?options:string list ->
+  ?bands:int * (_, _) Band.Data.t ->
+  Driver.t -> string -> int * int -> t
+(** Like {!create} except that the function raises {!Invalid_source} if there
+    is an error. *)
 
 val copy : ?options:string list -> src:t -> dst:t -> unit
 (** [copy ?options ~src ~dst] efficiently copies data from [src] to [dst].

@@ -1,6 +1,8 @@
 open Ctypes
 open Foreign
 
+exception Invalid_driver
+
 type t = T.t
 let t = T.t
 
@@ -22,6 +24,11 @@ let get_by_name name =
     None
   else
     Some driver
+
+let get_by_name_exn name =
+  match get_by_name name with
+  | Some d -> d
+  | None -> raise Invalid_driver
 
 let identify =
   Lib.c "GDALIdentifyDriver"
