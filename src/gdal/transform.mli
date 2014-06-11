@@ -1,3 +1,5 @@
+exception Invalid_transform
+
 type data_t =
   (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t
 (** Input coordinates are provided as bigarrays. *)

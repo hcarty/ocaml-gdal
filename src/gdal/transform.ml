@@ -1,5 +1,7 @@
 open Ctypes
 
+exception Invalid_transform
+
 type data_t = (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t
 type result_t =
   (int, Bigarray.int_elt, Bigarray.c_layout) Bigarray.Array1.t option
@@ -75,6 +77,7 @@ module Gen_img = struct
     let src_ds, src_wkt = tuple_of_transform src in
     let dst_ds, dst_wkt = tuple_of_transform dst in
     let t = create src_ds src_wkt dst_ds dst_wkt gcp_ok 0.0 gcp_order in
+    if t = null then raise Invalid_transform;
     Gc.finalise destroy t;
     t
 end
@@ -96,6 +99,7 @@ module Repojection = struct
 
   let create ~src ~dst =
     let t = create src dst in
+    if t = null then raise Invalid_transform;
     Gc.finalise destroy t;
     t
 end
