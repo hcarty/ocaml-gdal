@@ -154,7 +154,7 @@ let io
   in
   io
     c
-    (if write = None then 0 else 1)
+    (match write with None -> 0 | Some _ -> 1)
     (fst offset)
     (snd offset)
     (fst size)
@@ -276,7 +276,7 @@ module Block = struct
       match data with
       | None -> Bigarray.(Array2.create k c_layout nx ny)
       | Some ba ->
-        if nx * ny <= Bigarray.Array2.dim1 ba * Bigarray.Array2.dim2 ba then
+        if nx = Bigarray.Array2.dim1 ba && ny = Bigarray.Array2.dim2 ba then
           ba
         else
           raise Wrong_dimensions
