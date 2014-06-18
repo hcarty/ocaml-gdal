@@ -123,25 +123,25 @@ let io
     ((c, _) as t)
     (kind : ('v, 'e) Data.t)
   =
-  let (x_size, y_size) as size =
+  let (data_cols, data_rows) as size =
     match size with
     | None -> get_size t
     | Some s -> s
   in
-  let buffer_x, buffer_y =
-    let bx, by =
+  let buffer_cols, buffer_rows =
+    let cols, rows =
       match buffer_size with
       | None -> size
       | Some s -> s
     in
     match write with
-    | None -> bx, by
+    | None -> cols, rows
     | Some a ->
       if
-        bx = Bigarray.Array2.dim1 a &&
-        by = Bigarray.Array2.dim2 a
+        rows = Bigarray.Array2.dim1 a &&
+        cols = Bigarray.Array2.dim2 a
       then
-        bx, by
+        cols, rows
       else
         raise Invalid_dimensions
   in
@@ -149,7 +149,7 @@ let io
     match write with
     | None ->
       let open Bigarray in
-      Array2.create (Data.to_ba_kind kind) c_layout buffer_x buffer_y
+      Array2.create (Data.to_ba_kind kind) c_layout buffer_rows buffer_cols
     | Some buffer -> buffer
   in
   io
@@ -160,8 +160,8 @@ let io
     (fst size)
     (snd size)
     (bigarray_start array2 ba |> to_voidp)
-    buffer_x
-    buffer_y
+    buffer_cols
+    buffer_rows
     (Data.to_int kind)
     pixel_spacing
     line_spacing;
@@ -236,114 +236,122 @@ module Block = struct
       (t @-> ptr int @-> ptr int @-> returning void)
 
   let get_size (t, _) =
-    let i = allocate int 0 in
-    let j = allocate int 0 in
-    get_size t i j;
-    !@i, !@j
+    let cols = allocate int 0 in
+    let rows = allocate int 0 in
+    get_size t cols rows;
+    !@cols, !@rows
 
   let pixel_of_block_offset t =
-    let block_x_size, block_y_size = get_size t in
-    fun { block = (i_block, j_block); offset = (i, j) } ->
-      let i_pixel = i_block * block_x_size + i in
-      let j_pixel = j_block * block_y_size + j in
-      i_pixel, j_pixel
+    let block_cols, block_rows = get_size t in
+    fun { block = (block_col, block_row); offset = (off_col, off_row) } ->
+      let pixel_col = block_col * block_cols + off_col in
+      let pixel_row = block_row * block_rows + off_row in
+      pixel_col, pixel_row
 
   let block_of_pixel_offset t =
-    let block_x_size, block_y_size = get_size t in
-    fun i j ->
-      let i_block = i / block_x_size in
-      let j_block = j / block_y_size in
-      let i_offset = i mod block_x_size in
-      let j_offset = j mod block_y_size in
+    let block_cols, block_rows = get_size t in
+    fun pixel_col pixel_row ->
+      let block_col = pixel_col / block_cols in
+      let block_row = pixel_row / block_rows in
+      let offset_col = pixel_col mod block_cols in
+      let offset_row = pixel_row mod block_rows in
       {
-        block = i_block, j_block;
-        offset = i_offset, j_offset;
+        block = block_col, block_row;
+        offset = offset_col, offset_row;
       }
 
   let get_block_count t =
-    let bandx, bandy = get_band_size t in
-    let blockx, blocky = get_size t in
-    (bandx + blockx - 1) / blockx,
-    (bandy + blocky - 1) / blocky
+    let band_cols, band_rows = get_band_size t in
+    let block_cols, block_rows = get_size t in
+    (band_cols + block_cols - 1) / block_cols,
+    (band_rows + block_rows - 1) / block_rows
 
   let read =
     Lib.c "GDALReadBlock"
       (t @-> int @-> int @-> ptr void @-> returning err)
 
-  let read ?data ((c, k) as t) ~i ~j =
-    let nx, ny = get_size t in
+  let read ?data ((c, k) as t) ~column ~row =
+    let columns, rows = get_size t in
     let ba =
       match data with
-      | None -> Bigarray.(Array2.create k c_layout nx ny)
+      | None -> Bigarray.(Array2.create k c_layout rows columns)
       | Some ba ->
-        if nx = Bigarray.Array2.dim1 ba && ny = Bigarray.Array2.dim2 ba then
+        if
+          columns = Bigarray.Array2.dim2 ba &&
+          rows = Bigarray.Array2.dim1 ba
+        then
           ba
         else
           raise Wrong_dimensions
     in
-    read c i j (bigarray_start array2 ba |> to_voidp);
+    read c column row (bigarray_start array2 ba |> to_voidp);
     ba
 
   let write =
     Lib.c "GDALWriteBlock"
       (t @-> int @-> int @-> ptr void @-> returning err)
 
-  let write (t, _) ~i ~j data =
-    write t i j (bigarray_start array2 data |> to_voidp)
+  let write (t, _) ~column ~row data =
+    write t column row (bigarray_start array2 data |> to_voidp)
 
   let read' = read
   let write' = write
 
   let iter ((_c, k) as t) ~read ~write f =
-    let ni, nj = get_block_count t in
-    let nx, ny = get_size t in
-    let bandx, bandy = get_band_size t in
-    let data = Bigarray.(Array2.create k c_layout nx ny) in
-    for i = 0 to ni - 1 do
-      for j = 0 to nj - 1 do
+    let block_cols, block_rows = get_block_count t in
+    let pixel_cols, pixel_rows = get_size t in
+    let band_cols, band_rows = get_band_size t in
+    let data = Bigarray.(Array2.create k c_layout pixel_rows pixel_cols) in
+    for block_row = 0 to block_rows - 1 do
+      for block_col = 0 to block_cols - 1 do
         let data =
-          if read then read' ~data t ~i ~j
+          if read then read' ~data t ~column:block_col ~row:block_row
           else data
         in
-        let valid, valid_x, valid_y =
+        let valid, valid_cols, valid_rows =
           if
-            (i + 1) * nx > bandx ||
-            (j + 1) * ny > bandy
+            (block_row + 1) * pixel_rows > band_rows ||
+            (block_col + 1) * pixel_cols > band_cols
           then (
             (* Only pass valid data to f *)
-            let valid_x = bandx - i * nx in
-            let valid_y = bandy - j * ny in
+            let valid_cols =
+              min (band_cols - block_col * pixel_cols) pixel_cols
+            in
+            let valid_rows =
+              min (band_rows - block_row * pixel_rows) pixel_rows
+            in
             let valid =
-              Bigarray.Array2.create k Bigarray.c_layout valid_x valid_y
+              Bigarray.Array2.create k Bigarray.c_layout
+                valid_rows valid_cols
             in
             begin
               if read then (
-                for si = 0 to valid_x - 1 do
-                  for sj = 0 to valid_y - 1 do
-                    valid.{si, sj} <- data.{si, sj}
+                for r = 0 to valid_rows - 1 do
+                  for c = 0 to valid_cols - 1 do
+                    valid.{r, c} <- data.{r, c}
                   done;
                 done;
               )
               else (
               )
             end;
-            valid, valid_x, valid_y
+            valid, valid_cols, valid_rows
           )
           else
-            data, nx, ny
+            data, pixel_cols, pixel_rows
         in
-        f i j valid;
+        f block_col block_row valid;
         if write then (
           (* If we created a fresh bigarray copy the values back to data for
              writing. Physical equality is intentional here. *)
           if valid != data then (
-            for si = 0 to valid_x - 1 do
-              for sj = 0 to valid_y - 1 do
-                data.{si, sj} <- valid.{si, sj}
+            for r = 0 to valid_rows - 1 do
+              for c = 0 to valid_cols - 1 do
+                data.{r, c} <- valid.{r, c}
               done;
             done;
           );
-          write' t ~i ~j data;
+          write' t ~column:block_col ~row:block_row data;
         );
       done;
     done;
@@ -354,55 +362,55 @@ module Block = struct
 end
 
 let iter t f =
-  let block_x_size, block_y_size = Block.get_size t in
+  let block_cols, block_rows = Block.get_size t in
   Block.iter t ~read:true ~write:true (
-    fun block_i block_j data ->
+    fun block_col block_row data ->
       let open Bigarray in
-      let ni = Array2.dim1 data in
-      let nj = Array2.dim2 data in
-      for data_i = 0 to ni - 1 do
-        for data_j = 0 to nj - 1 do
-          let i = block_i * block_x_size + data_i in
-          let j = block_j * block_y_size + data_j in
-          let v = data.{data_i, data_j} in
-          let result = f i j v in
-          data.{data_i, data_j} <- result;
+      let pixel_rows = Array2.dim1 data in
+      let pixel_cols = Array2.dim2 data in
+      for pixel_row = 0 to pixel_rows - 1 do
+        for pixel_col = 0 to pixel_cols - 1 do
+          let col = block_col * block_cols + pixel_col in
+          let row = block_row * block_rows + pixel_row in
+          let v = data.{row, col} in
+          let result = f col row v in
+          data.{row, col} <- result;
         done;
       done;
       ()
   )
 
 let iter_read t f =
-  let block_x_size, block_y_size = Block.get_size t in
+  let block_cols, block_rows = Block.get_size t in
   Block.iter t ~read:true ~write:false (
-    fun block_i block_j data ->
+    fun block_col block_row data ->
       let open Bigarray in
-      let ni = Array2.dim1 data in
-      let nj = Array2.dim2 data in
-      for data_i = 0 to ni - 1 do
-        for data_j = 0 to nj - 1 do
-          let i = block_i * block_x_size + data_i in
-          let j = block_j * block_y_size + data_j in
-          let v = data.{data_i, data_j} in
-          f i j v;
+      let pixel_rows = Array2.dim1 data in
+      let pixel_cols = Array2.dim2 data in
+      for pixel_row = 0 to pixel_rows - 1 do
+        for pixel_col = 0 to pixel_cols - 1 do
+          let col = block_col * block_cols + pixel_col in
+          let row = block_row * block_rows + pixel_row in
+          let v = data.{row, col} in
+          f col row v;
         done;
       done;
       ()
   )
 
 let iter_write t f =
-  let block_x_size, block_y_size = Block.get_size t in
+  let block_cols, block_rows = Block.get_size t in
   Block.iter t ~read:false ~write:true (
-    fun block_i block_j data ->
+    fun block_col block_row data ->
       let open Bigarray in
-      let ni = Array2.dim1 data in
-      let nj = Array2.dim2 data in
-      for data_i = 0 to ni - 1 do
-        for data_j = 0 to nj - 1 do
-          let i = block_i * block_x_size + data_i in
-          let j = block_j * block_y_size + data_j in
-          let result = f i j in
-          data.{data_i, data_j} <- result;
+      let pixel_rows = Array2.dim1 data in
+      let pixel_cols = Array2.dim2 data in
+      for pixel_row = 0 to pixel_rows - 1 do
+        for pixel_col = 0 to pixel_cols - 1 do
+          let col = block_col * block_cols + pixel_col in
+          let row = block_row * block_rows + pixel_row in
+          let result = f col row in
+          data.{row, col} <- result;
         done;
       done;
       ()
@@ -411,7 +419,7 @@ let iter_write t f =
 let fold t f init =
   let accu = ref init in
   iter_read t (
-    fun i j v ->
-      accu := f i j v !accu
+    fun col row v ->
+      accu := f col row v !accu
   );
   !accu

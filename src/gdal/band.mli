@@ -94,21 +94,21 @@ val iter : ('v, _) t -> (int -> int -> 'v -> 'v) -> unit
 (** [iter t f] applies [f] to every value in [t] then assigns the result back
     to the same point in [t].
 
-    @param f gets three arguments: [i], [j] and the [v]alue at this location
-    in the band. *)
+    @param f gets three arguments: [column], [row] and the [v]alue at this
+    location in the band. *)
 
 val iter_read : ('v, _) t -> (int -> int -> 'v -> unit) -> unit
 (** [iter_read t f] calls [f] with every value in [t].
 
-    @param f gets three arguments: [i], [j] for the pixel offset within the
-    band and the [v]alue at this offset. *)
+    @param f gets three arguments: [column], [row] for the pixel offset within
+    the band and the [v]alue at this offset. *)
 
 val iter_write : ('v, _) t -> (int -> int -> 'v) -> unit
 (** [iter_read t f] calls [f] with every pixel offset in [t].  The result of
     [f] is written back to [t] at the current offset.
 
-    @param f gets three arguments: [i], [j] for the pixel offset within the
-    band. *)
+    @param f gets three arguments: [column], [row] for the pixel offset within the
+    band and the [v]alue at this offset. *)
 
 val fold : ('v, _) t -> (int -> int -> 'v -> 'accu -> 'accu) -> 'accu -> 'accu
 (** [fold t f init] folds over the pixels in [t] with [f]. *)
@@ -154,9 +154,9 @@ module Block : sig
 
   val read :
     ?data:('v, 'e, Bigarray.c_layout) Bigarray.Array2.t ->
-    ('v, 'e) t -> i:int -> j:int ->
+    ('v, 'e) t -> column:int -> row:int ->
     ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t
-  (** [read ?data t ~i ~j] returns the block at the [(i, j)] offset in [t].
+  (** [read ?data t ~column ~row] returns the block at given offset in [t].
 
       @param data will be written to and returned if it is provided, otherwise
              a fresh {!Bigarray.Array2.t} will be allocated.  [data] must be
@@ -164,10 +164,10 @@ module Block : sig
       @raise Wrong_dimensions if [data] is provided and does not have enough
              elements to hold a block. *)
 
-  val write : ('v, 'e) t -> i:int -> j:int ->
+  val write : ('v, 'e) t -> column:int -> row:int ->
     ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t -> unit
-  (** [write t ~i ~j data] writes [data] to the block at the [(i, j)] offset in
-      [t]. *)
+  (** [write t ~column ~row data] writes [data] to the block at the given offset
+      in [t]. *)
 
   val iter :
     ('v, 'e) t ->
@@ -190,7 +190,7 @@ module Block : sig
     unit
   (** [iter_read t f] applies [f] to each block in [t].
 
-      @param f gets three arguments: the [i] index, [j] index and a
+      @param f gets three arguments: the [column] index, [row] index and a
       bigarray with the contents of the current block. *)
 
   val iter_write :
@@ -199,7 +199,7 @@ module Block : sig
     unit
   (** [iter_write t f] applies [f] to each block in [t].
 
-      @param f gets three arguments: the [i] index, [j] index and a
+      @param f gets three arguments: the [column] index, [row] index and a
       bigarray which should be filled with the values meant for the current
       block. *)
 end
