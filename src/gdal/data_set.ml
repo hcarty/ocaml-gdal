@@ -137,8 +137,8 @@ let create ?(options = []) ?bands driver name (nx, ny) =
   else
     `Ok ds
 
-let create_exn ?options ?bands driver name (nx, ny) =
-  match create ?options ?bands driver name (nx, ny) with
+let create_exn ?options ?bands driver name dims =
+  match create ?options ?bands driver name dims with
   | `Ok c -> c
   | `Error _ -> raise Invalid_source
 
