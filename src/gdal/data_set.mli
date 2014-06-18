@@ -10,6 +10,7 @@ exception Invalid_projection
 exception Band_error
 exception Copy_error
 exception Overview_error
+exception Wrong_data_type
 
 val of_source :
   ?write:bool ->

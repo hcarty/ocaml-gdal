@@ -10,6 +10,7 @@ exception Invalid_projection
 exception Band_error
 exception Copy_error
 exception Overview_error
+exception Wrong_data_type
 
 let proj_err = T.err Invalid_projection
 let band_err = T.err Band_error
@@ -78,7 +79,7 @@ let get_band t i kind =
   if Band.check_data_type c kind then
     (c, Band.Data.to_ba_kind kind)
   else
-    invalid_arg "get_band"
+    raise Wrong_data_type
 
 let add_band =
   Lib.c "GDALAddBand"
