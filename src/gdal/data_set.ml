@@ -122,7 +122,7 @@ let create =
     returning t
   )
 
-let create ?(options = []) ?bands driver name (nx, ny) =
+let create ?(options = []) ?bands driver name (columns, rows) =
   let nbands, kind =
     match bands with
     | None -> 0, None
@@ -131,7 +131,7 @@ let create ?(options = []) ?bands driver name (nx, ny) =
   let options = Lib.convert_creation_options options in
   let ds =
     create
-      driver name nx ny nbands (Band.Data.to_int_opt kind) options
+      driver name columns rows nbands (Band.Data.to_int_opt kind) options
   in
   if ds = null then
     `Error `Invalid_source
