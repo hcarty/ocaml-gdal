@@ -25,11 +25,17 @@ let protect f x ~finally =
 (* Safely convert string lists (NULL for empty lists) *)
 let convert_creation_options options =
   match options with
-  | [] -> null
+  | [] -> from_voidp string_opt null
   | _ ->
-    CArray.of_list string options
-    |> CArray.start
-    |> to_voidp
+    (* We need a null pointer at the end of the array *)
+    let n = List.length options + 1 in
+    let ca = CArray.make string_opt n in
+    List.iteri (
+      fun i o ->
+        CArray.set ca i (Some o)
+    ) options;
+    CArray.set ca (n - 1) None;
+    CArray.start ca
 
 let set_cache_max =
   c "GDALSetCacheMax64"

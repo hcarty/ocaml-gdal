@@ -36,5 +36,5 @@ val get_config_option : ?default:string -> string -> string option
 (**/**)
 val c : string -> ('a -> 'b) Ctypes.fn -> 'a -> 'b
 val protect : ('a -> 'b) -> 'a -> finally:('a -> unit) -> 'b
-val convert_creation_options : string list -> unit Ctypes.ptr
+val convert_creation_options : string list -> string option Ctypes.ptr
 (** Internal support functions *)

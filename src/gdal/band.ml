@@ -213,7 +213,7 @@ let set_no_data_value (t, _) x =
 
 let copy =
   Lib.c "GDALRasterBandCopyWholeRaster"
-    (t @-> t @-> ptr void @-> ptr void @-> ptr void @-> returning err)
+    (t @-> t @-> ptr string_opt @-> ptr void @-> ptr void @-> returning err)
 
 let copy ?(options = []) ~src:(s, _) ~dst:(d, _) =
   copy s d (Lib.convert_creation_options options) null null

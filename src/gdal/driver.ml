@@ -32,7 +32,7 @@ let get_by_name_exn name =
 
 let identify =
   Lib.c "GDALIdentifyDriver"
-    (string @-> ptr void @-> returning t)
+    (string @-> ptr string_opt @-> returning t)
 
 let identify ?(options = []) name =
   let options = Lib.convert_creation_options options in

@@ -6,7 +6,7 @@ let err = T.err Algorithm_error
 
 let proximity =
   Lib.c "GDALComputeProximity"
-    (Band.t @-> Band.t @-> ptr void @-> ptr void @-> ptr void @-> returning err)
+    (Band.t @-> Band.t @-> ptr string_opt @-> ptr void @-> ptr void @-> returning err)
 
 let proximity ?(options = []) ~src:(sc, _) ~test:(tc, _) =
   let options = Lib.convert_creation_options options in
@@ -16,7 +16,7 @@ let fill_nodata =
   Lib.c "GDALFillNoData" (
     Band.t @-> Band.t @->
     double @-> int @-> int @->
-    ptr void @->
+    ptr string_opt @->
     ptr void @-> ptr void @->
     returning err
   )

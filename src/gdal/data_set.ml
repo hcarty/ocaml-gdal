@@ -83,7 +83,7 @@ let get_band t i kind =
 
 let add_band =
   Lib.c "GDALAddBand"
-    (t @-> int @-> ptr void @-> returning band_err)
+    (t @-> int @-> ptr string_opt @-> returning band_err)
 
 let add_band ?(options = []) t kind =
   let i = Band.Data.to_int kind in
@@ -95,7 +95,7 @@ let create_copy =
     string @->
     t @->
     int @->
-    ptr void @-> ptr void @-> ptr void @->
+    ptr string_opt @-> ptr void @-> ptr void @->
     returning t
   )
 
@@ -118,7 +118,7 @@ let create_copy_exn ?strict ?options src driver name =
 
 let create =
   Lib.c "GDALCreate" (
-    Driver.t @-> string @-> int @-> int @-> int @-> int @-> ptr void @->
+    Driver.t @-> string @-> int @-> int @-> int @-> int @-> ptr string_opt @->
     returning t
   )
 
@@ -145,7 +145,7 @@ let create_exn ?options ?bands driver name dims =
 
 let copy =
   Lib.c "GDALDatasetCopyWholeRaster"
-    (t @-> t @-> ptr void @-> ptr void @-> ptr void @-> returning copy_err)
+    (t @-> t @-> ptr string_opt @-> ptr void @-> ptr void @-> returning copy_err)
 
 let copy ?(options = []) ~src ~dst =
   copy src dst (Lib.convert_creation_options options) null null
