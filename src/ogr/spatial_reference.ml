@@ -20,6 +20,10 @@ let import_from_wkt =
   Lib.c "OSRImportFromWkt"
     (t @-> ptr string @-> returning err)
 
+let set_well_known_geog_cs =
+  Lib.c "OSRSetWellKnownGeogCS"
+    (t @-> string @-> returning err)
+
 let destroy_spatial_reference =
   Lib.c "OSRDestroySpatialReference"
     (t @-> returning void)
@@ -51,6 +55,7 @@ let make kind spec =
     | `wkt ->
       let spec_ptr = allocate string spec in
       import_from_wkt sr spec_ptr
+    | `name -> set_well_known_geog_cs sr spec
   in
   sr
 
