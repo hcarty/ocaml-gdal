@@ -35,8 +35,9 @@ Library gdal
                    Driver,
                    Geo_transform,
                    Lib,
-                   Transform
-  InternalModules: T, Warp
+                   Transform,
+                   Warp
+  InternalModules: T
 
 Flag examples
   Description: Build examples

@@ -184,7 +184,3 @@ module Grid = struct
       null null;
     ba
 end
-
-module Warp = struct
-  include Warp
-end
