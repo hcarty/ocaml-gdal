@@ -24,10 +24,29 @@ module Options : sig
   val set_src : t -> Data_set.t -> unit
   val set_dst : t -> Data_set.t -> unit
   val set_bands : t -> (int * int) list -> unit
-  val set_src_no_data : t -> real:float option -> imag:float option -> unit
-  val set_dst_no_data : t -> real:float option -> imag:float option -> unit
+  val set_src_no_data_real : t -> float list -> unit
+  val set_src_no_data_imag : t -> float list -> unit
+  val set_dst_no_data_real : t -> float list -> unit
+  val set_dst_no_data_real : t -> float list -> unit
   (** [set_* t ...] set warp option fields.  See the [gdalwarper.h]
       documentation for descriptions of the affected fields. *)
+
+  val make :
+    ?warp_options:string list ->
+    ?memory_limit:float ->
+    ?resample_alg:resample_t ->
+    ?working_data_type:(_, _) Band.Data.t ->
+    ?src:Data_set.t ->
+    ?dst:Data_set.t ->
+    ?bands:(int * int) list ->
+    ?src_no_data_real:float list ->
+    ?src_no_data_imag:float list ->
+    ?dst_no_data_real:float list ->
+    ?dst_no_data_imag:float list ->
+    unit -> t
+  (** Create and initialize warp options.  The arguments to [make] can be used
+      to override GDAL's defaults.  The parameters match the [set_*] functions
+      above. *)
 end
 
 val reproject_image :

@@ -22,6 +22,8 @@ module Options = struct
   type warp_options_t
   type t = warp_options_t structure ptr
 
+  exception Band_count_mismatch
+
   let t : warp_options_t structure typ = structure "GDALWarpOptions"
   let f n k = field t n k
   let warp_options = f "warp_options" (ptr string_opt)
@@ -135,23 +137,53 @@ module Options = struct
     setf !@o dst_bands (CArray.start dst);
     ()
 
-  let ptr_opt_of_option typ = function
-    | Some x -> Some (allocate typ x)
-    | None -> None
+  let ptr_opt_of_list typ = function
+    | [] -> None
+    | l -> Some (CArray.of_list typ l |> CArray.start)
 
-  let set_src_no_data o ~real ~imag =
-    let real = ptr_opt_of_option double real in
-    let imag = ptr_opt_of_option double imag in
-    setf !@o src_no_data_real real;
-    setf !@o src_no_data_imag imag;
-    ()
+  let set_band_dep o l f =
+    let bands = getf !@o band_count in
+    let n = List.length l in
+    if n > 0 && n <> bands then raise Band_count_mismatch;
+    let x = ptr_opt_of_list double l in
+    setf !@o f x
 
-  let set_dst_no_data o ~real ~imag =
-    let real = ptr_opt_of_option double real in
-    let imag = ptr_opt_of_option double imag in
-    setf !@o dst_no_data_real real;
-    setf !@o dst_no_data_imag imag;
-    ()
+  let set_src_no_data_real o l =
+    set_band_dep o l src_no_data_real
+
+  let set_src_no_data_imag o l =
+    set_band_dep o l src_no_data_imag
+
+  let set_dst_no_data_real o l =
+    set_band_dep o l dst_no_data_real
+
+  let set_dst_no_data_imag o l =
+    set_band_dep o l dst_no_data_imag
+
+  let may f o =
+    match o with
+    | None -> ()
+    | Some x -> f x
+
+  let make ?warp_options ?memory_limit ?resample_alg ?working_data_type
+      ?src ?dst ?bands
+      ?src_no_data_real ?src_no_data_imag
+      ?dst_no_data_real ?dst_no_data_imag
+      () =
+    let o = create () in
+    let mayo f x = may (f o) x in
+    mayo set_warp_options warp_options;
+    mayo set_memory_limit memory_limit;
+    mayo set_resample_alg resample_alg;
+    mayo set_working_data_type working_data_type;
+    mayo set_src src;
+    mayo set_dst dst;
+    mayo set_bands bands;
+    mayo set_src_no_data_real src_no_data_real;
+    mayo set_src_no_data_imag src_no_data_imag;
+    mayo set_dst_no_data_real dst_no_data_real;
+    mayo set_dst_no_data_imag dst_no_data_imag;
+    o
 end
 
 let reproject_image =
