@@ -36,6 +36,7 @@ Library gdal
                    Geo_transform,
                    Lib,
                    Transform,
+                   Vsi,
                    Warp
   InternalModules: T
 

@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 13311bbcdd94cbbb6f8030547504e66a)
+# DO NOT EDIT (digest: 2613aabf64228db43ab78530e897597b)
 Alg
 Band
 Data_set
@@ -7,6 +7,7 @@ Driver
 Geo_transform
 Lib
 Transform
+Vsi
 Warp
 T
 # OASIS_STOP
