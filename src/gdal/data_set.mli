@@ -130,7 +130,7 @@ val of_band : (_, _) Band.t -> t
 (** [of_band band] returns the {!t} associated with [band]. *)
 
 val build_overviews :
-  ?factors:int list -> ?bands:int list -> t -> string -> unit
-(** [build_overviews ?factors ?bands t resampling] builds overviews for [t] on
+  ?bands:int list -> t -> int list -> string -> unit
+(** [build_overviews ?bands t factors resampling] builds overviews for [t] on
     bands [bands] using decimation factors [factors] with resampling method
     [resampling]. *)

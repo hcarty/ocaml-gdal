@@ -163,15 +163,14 @@ let of_band (band, _) =
 
 let build_overviews =
   Lib.c "GDALBuildOverviews"
-    (string @-> int @-> ptr int @-> int @-> ptr int @-> ptr void @-> ptr void
+    (t @-> string @-> int @-> ptr int @-> int @-> ptr int @-> ptr void @-> ptr void
      @-> returning overview_err)
 
-let build_overviews ?factors ?bands t resampling =
+let build_overviews ?bands t factors resampling =
   let n_factors, factors =
     match factors with
-    | None
-    | Some [] -> 0, null |> from_voidp int
-    | Some f ->
+    | [] -> 0, null |> from_voidp int
+    | f ->
       let ca = CArray.of_list int f in
       CArray.length ca, CArray.start ca
   in
@@ -183,4 +182,4 @@ let build_overviews ?factors ?bands t resampling =
       let ca = CArray.of_list int b in
       CArray.length ca, CArray.start ca
   in
-  build_overviews resampling n_factors factors n_bands bands null null
+  build_overviews t resampling n_factors factors n_bands bands null null
