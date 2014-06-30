@@ -51,6 +51,40 @@ module Options : sig
       above. *)
 end
 
+module Operation : sig
+  (** {2 Warp Operations} *)
+
+  type t
+
+  val create : Options.t -> t
+  (** [create o] creates a warp operation value based on the given options. *)
+
+  val warp_region :
+    ?dst_offset:int * int ->
+    ?dst_size:int * int ->
+    ?src_offset:int * int ->
+    ?src_size:int * int ->
+    t -> unit
+  (** [warp_region ?dst_offset ?dst_size ?src_offset ?src_size op] warps the
+      defined region according to [op].
+
+      The optional parameters default to all zeroes which will result in the
+      entire image being warped. *)
+
+  val warp_region_to_buffer :
+    ?dst_offset:int * int ->
+    ?dst_size:int * int ->
+    ?src_offset:int * int ->
+    ?src_size:int * int ->
+    ?buffer:('e, 'v, Bigarray.c_layout) Bigarray.Array2.t ->
+    t -> ('e, 'v) Band.Data.t ->
+    ('e, 'v, Bigarray.c_layout) Bigarray.Array2.t
+  (** [warp_region_to_buffer] is like {!warp_region} except that it writes
+      the result to [buffer].
+
+      @param buffer may be used to provide a pre-allocated output buffer. *)
+end
+
 val reproject_image :
   ?memory_limit:float ->
   ?max_error:float ->

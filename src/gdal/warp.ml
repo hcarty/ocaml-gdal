@@ -230,3 +230,73 @@ let auto_create_warped_vrt ?src_wkt ?dst_wkt ?(max_error = 0.0)
   match result with
   | Some ds -> ds
   | None -> raise Warp_error
+
+module Operation = struct
+  type t = T.t
+  let t = T.t
+
+  let create =
+    Lib.c "GDALCreateWarpOperation"
+      (ptr Options.t @-> returning t)
+
+  let destroy =
+    Lib.c "GDALDestroyWarpOperation"
+      (t @-> returning void)
+
+  let create options =
+    let result = create options in
+    if result == null then
+      raise Warp_error
+    else (
+      Gc.finalise destroy result;
+      result
+    )
+
+  let warp_region =
+    Lib.c "GDALWarpRegion"
+      (t @-> int @-> int @-> int @-> int @-> int @-> int @-> int @-> int @->
+       returning err)
+
+  let warp_region ?(dst_offset = 0, 0) ?(dst_size = 0, 0)
+      ?(src_offset = 0, 0) ?(src_size = 0, 0)
+      o =
+    let dox, doy = dst_offset in
+    let dsx, dsy = dst_size in
+    let sox, soy = src_offset in
+    let ssx, ssy = src_size in
+    warp_region o dox doy dsx dsy sox soy ssx ssy
+
+  let warp_region_to_buffer =
+    Lib.c "GDALWarpRegionToBuffer"
+      (t @-> int @-> int @-> int @-> int @->
+       ptr void @-> int @->
+       int @-> int @-> int @-> int @->
+       returning err)
+
+  let warp_region_to_buffer ?(dst_offset = 0, 0) ?(dst_size = 0, 0)
+      ?(src_offset = 0, 0) ?(src_size = 0, 0)
+      ?buffer
+      o dt =
+    let open Bigarray in
+    let dox, doy = dst_offset in
+    let dsx, dsy = dst_size in
+    let sox, soy = src_offset in
+    let ssx, ssy = src_size in
+    let buffer =
+      match buffer with
+      | Some b ->
+        let rows = Array2.dim1 b in
+        let cols = Array2.dim2 b in
+        if cols < dox + dsx || rows < doy + dsy then
+          invalid_arg "Buffer is too small"
+        else
+          b
+      | None ->
+        let kind = Band.Data.to_ba_kind dt in
+        Array2.create kind c_layout (doy + dsy) (dox + dsx)
+    in
+    let buffer_ptr = bigarray_start array2 buffer |> to_voidp in
+    let dt_i = Band.Data.to_int dt in
+    warp_region_to_buffer o dox doy dsx dsy buffer_ptr dt_i sox soy ssx ssy;
+    buffer
+end
