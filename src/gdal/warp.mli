@@ -1,3 +1,5 @@
+(** {1 Raster Interpolation and Resampling} *)
+
 type resample_t =
   | Nearest_neighbor
   | Bilinear
