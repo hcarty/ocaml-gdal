@@ -252,6 +252,20 @@ module Operation = struct
       result
     )
 
+  let chunk_and_warp_image =
+    Lib.c "GDALChunkAndWarpImage"
+      (t @-> int @-> int @-> int @-> int @-> returning err)
+
+  let chunk_and_warp_image t ~offset ~size =
+    chunk_and_warp_image t (fst offset) (snd offset) (fst size) (snd size)
+
+  let chunk_and_warp_multi =
+    Lib.c "GDALChunkAndWarpMulti"
+      (t @-> int @-> int @-> int @-> int @-> returning err)
+
+  let chunk_and_warp_multi t ~offset ~size =
+    chunk_and_warp_multi t (fst offset) (snd offset) (fst size) (snd size)
+
   let warp_region =
     Lib.c "GDALWarpRegion"
       (t @-> int @-> int @-> int @-> int @-> int @-> int @-> int @-> int @->
@@ -299,4 +313,27 @@ module Operation = struct
     let dt_i = Band.Data.to_int dt in
     warp_region_to_buffer o dox doy dsx dsy buffer_ptr dt_i sox soy ssx ssy;
     buffer
+
+  let wrap ?offset ?size options f =
+    let offset =
+      match offset with
+      | Some o -> o
+      | None -> 0, 0
+    in
+    let size =
+      match size with
+      | Some s -> s
+      | None ->
+        let ds = getf !@options Options.src_ds in
+        Data_set.get_x_size ds,
+        Data_set.get_y_size ds
+    in
+    let operation = create options in
+    f operation ~offset ~size
+
+  let warp ?offset ?size options =
+    wrap ?offset ?size options chunk_and_warp_image
+
+  let warp_multi ?offset ?size options =
+    wrap ?offset ?size options chunk_and_warp_multi
 end

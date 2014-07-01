@@ -59,6 +59,23 @@ module Operation : sig
   val create : Options.t -> t
   (** [create o] creates a warp operation value based on the given options. *)
 
+  val warp : ?offset:int * int -> ?size:int * int -> Options.t -> unit
+  val warp_multi : ?offset:int * int -> ?size:int * int -> Options.t -> unit
+  (** Convenience functions for carrying out a warping operation.  They use the
+      [chunk_and_warp_*] functions internally. *)
+
+  val chunk_and_warp_image : t -> offset:int * int -> size:int * int -> unit
+  val chunk_and_warp_multi : t -> offset:int * int -> size:int * int -> unit
+  (** [chunk_and_warp_* t ~offset ~size] carry out the warp operation [t] by
+      chopping up the processing into chunks which are small enough to fit in
+      the memory limits specified in the {!Options.t} value used to create
+      [t].
+
+      @param offset specifies the [(x, y)] pixel offset to target in the
+      destination data source.
+      @param size specifies the [(x, y)] size in pixels of the region to warp
+      to in the destination data source. *)
+
   val warp_region :
     ?dst_offset:int * int ->
     ?dst_size:int * int ->
