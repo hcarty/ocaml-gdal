@@ -26,7 +26,9 @@ let transform_ml name ct t forward (xs : data_t) (ys : data_t) (zs : data_t) =
   in
   let success =
     let open Bigarray in
-    Array1.create int c_layout n
+    let a = Array1.create int c_layout n in
+    Array1.fill a 1;
+    a
   in
   let f = transform_c name ct in
   let result =
