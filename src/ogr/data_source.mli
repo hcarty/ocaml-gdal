@@ -14,6 +14,13 @@ val of_source : ?write:bool -> string -> [ `Invalid_source | `Ok of t ]
 
     @return `Invalid_source if [name] does not represent a valid data source. *)
 
+val of_source_exn : ?write:bool -> string -> t
+(** Like {!of_source} but raises {!Invalid_source} if there is an error with
+    the data source. *)
+
+val destroy : t -> unit
+(** [destroy t] releases the resources associated with [t]. *)
+
 val with_source :
   ?write:bool ->
   string ->
@@ -26,9 +33,15 @@ val with_source :
     This is a wrapper around {!of_source}.  See its documentation for a
     description of the expected arguments. *)
 
+val with_source_exn : ?write:bool -> string -> (t -> 'a) -> 'a
+(** Like {!with_source} but raises {!Invalid_source} if there is an error with
+    the data source. *)
+
 val get_layer_by_name : t -> string -> Layer.t
 val get_layer : t -> int -> Layer.t
 (** [get_layer* src id] returns a {!Layer.t} extracted from [src]. *)
+
+(**/**)
 
 (** {2 Low level wrappers} *)
 
@@ -36,6 +49,5 @@ val get_layer : t -> int -> Layer.t
 
 exception Data_source_error
 
-val destroy : t -> unit
 val release : t -> unit
 (** @raise Data_source_error *)

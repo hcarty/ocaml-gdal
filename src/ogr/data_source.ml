@@ -5,6 +5,7 @@ type t = T.t
 let t = T.t
 
 exception Data_source_error
+exception Invalid_source
 
 let err = T.err Data_source_error
 
@@ -35,7 +36,17 @@ let of_source ?(write = false) name =
   else
     `Ok h
 
+let of_source_exn ?write name =
+  match of_source ?write name with
+  | `Ok h -> h
+  | `Invalid_source -> raise Invalid_source
+
 let with_source ?write name f =
   match of_source ?write name with
   | `Ok h -> `Ok (Lib.protect f h ~finally:destroy)
   | `Invalid_source -> `Invalid_source
+
+let with_source_exn ?write name f =
+  match with_source ?write name f with
+  | `Ok x -> x
+  | `Invalid_source -> raise Invalid_source
