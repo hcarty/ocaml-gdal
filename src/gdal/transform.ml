@@ -6,14 +6,20 @@ type data_t = (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t
 type result_t =
   (int, Bigarray.int_elt, Bigarray.c_layout) Bigarray.Array1.t option
 
-type 'a transform_t = 'a -> bool -> data_t -> data_t -> data_t -> result_t
+type 'a transform_t =
+  'a -> int -> int -> float ptr -> float ptr -> float ptr -> int ptr -> int
+
+let transform_t t =
+  t @->
+  int @-> int @->
+  ptr double @-> ptr double @-> ptr double @->
+  ptr int @->
+  returning int
 
 let transform_c name t =
-  Lib.c name
-    (t @-> int @-> int @-> ptr double @-> ptr double @-> ptr double @-> ptr int
-     @-> returning int)
+  Lib.c name (transform_t t)
 
-let transform_ml name ct t forward (xs : data_t) (ys : data_t) (zs : data_t) =
+let transform_ml c t forward (xs : data_t) (ys : data_t) (zs : data_t) =
   let n =
     let open Bigarray in
     let nx = Array1.dim xs in
@@ -30,9 +36,8 @@ let transform_ml name ct t forward (xs : data_t) (ys : data_t) (zs : data_t) =
     Array1.fill a 1;
     a
   in
-  let f = transform_c name ct in
   let result =
-    f t (if forward then 1 else 0) n
+    c t (if forward then 1 else 0) n
       (bigarray_start array1 xs)
       (bigarray_start array1 ys)
       (bigarray_start array1 zs)
@@ -66,8 +71,11 @@ module Gen_img = struct
     Lib.c "GDALDestroyGenImgProjTransformer"
       (t @-> returning void)
 
-  let transform =
-    transform_ml "GDALGenImgProjTransform" t
+  let c =
+    transform_c "GDALGenImgProjTransform" t
+
+  let ml t =
+    transform_ml c t
 
   let create ?gcp ~src ~dst =
     let gcp_ok, gcp_order =
@@ -96,8 +104,11 @@ module Repojection = struct
     Lib.c "GDALDestroyReprojectionTransformer"
       (t @-> returning void)
 
-  let transform =
-    transform_ml "GDALReprojectionTransform" t
+  let c =
+    transform_c "GDALReprojectionTransform" t
+
+  let ml t =
+    transform_ml c t
 
   let create ~src ~dst =
     let t = create src dst in
@@ -111,11 +122,21 @@ type t =
   | Repojection of Repojection.t
 
 let make_gen_img ?gcp ~src ~dst =
-  Gen_img (Gen_img.create ?gcp ~src ~dst)
+  let t = Gen_img.create ?gcp ~src ~dst in
+  Gen_img t
 
 let make_reprojection ~src ~dst =
-  Repojection (Repojection.create ~src ~dst)
+  let t = Repojection.create ~src ~dst in
+  Repojection t
 
 let transform = function
-  | Gen_img g -> Gen_img.transform g
-  | Repojection r -> Repojection.transform r
+  | Gen_img g -> Gen_img.ml g
+  | Repojection r -> Repojection.ml r
+
+let get_transform_t = function
+  | Gen_img g -> g
+  | Repojection r -> r
+
+let get_transform_c = function
+  | Gen_img _ -> Gen_img.c
+  | Repojection _ -> Repojection.c

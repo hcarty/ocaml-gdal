@@ -39,3 +39,17 @@ val transform : t -> bool -> data_t -> data_t -> data_t -> result_t
     @return [Some success] where [success] is an array of values indicating
     whether an individual point's transformation is successful or not.  [None]
     is returned if the overall transformation fails. *)
+
+(**/**)
+
+(** Ctype support functions for use from other modules *)
+
+open Ctypes
+open Foreign
+
+type 'a transform_t =
+  'a -> int -> int -> float ptr -> float ptr -> float ptr -> int ptr -> int
+
+val transform_t : 'a typ -> 'a transform_t fn
+val get_transform_t : t -> unit ptr
+val get_transform_c : t -> unit ptr transform_t
