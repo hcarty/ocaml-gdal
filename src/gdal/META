@@ -1,6 +1,6 @@
 # OASIS_START
-# DO NOT EDIT (digest: 95ef7974a1554fc778fc8af66b203b3c)
-version = "0.6.1"
+# DO NOT EDIT (digest: fecbf9a65842d9170fa2e1cb3ed4f76f)
+version = "0.7.0"
 description = "Bindings to the GDAL and OGR libraries"
 requires = "ctypes.foreign bigarray"
 archive(byte) = "gdal.cma"
