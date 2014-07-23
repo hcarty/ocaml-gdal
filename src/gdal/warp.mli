@@ -104,6 +104,19 @@ module Operation : sig
       @param buffer may be used to provide a pre-allocated output buffer. *)
 end
 
+type warp_output_t = {
+  geo_transform : Geo_transform.t;
+  pixels : int;
+  lines : int;
+}
+(** Suggested data set specifications for a warp destination *)
+
+val suggested_warp_output : Data_set.t -> Transform.t -> warp_output_t
+(** [suggested_warp_output ds transform] will suggest dimensions and
+    {!Geo_transform.t} parameters for a destination data set to warp [ds] into
+    based on the dimensions of [ds] and the parameters defined in
+    [transform]. *)
+
 val reproject_image :
   ?memory_limit:float ->
   ?max_error:float ->

@@ -241,6 +241,33 @@ let auto_create_warped_vrt ?src_wkt ?dst_wkt ?(max_error = 0.0)
   | Some ds -> ds
   | None -> raise Warp_error
 
+type warp_output_t = {
+  geo_transform : Geo_transform.t;
+  pixels : int;
+  lines : int;
+}
+
+let suggested_warp_output arg =
+  Lib.c "GDALSuggestedWarpOutput"
+    (Data_set.t @-> Foreign.funptr (Transform.transform_t arg) @-> arg @-> ptr double
+     @-> ptr int @-> ptr int @-> returning err)
+
+let suggested_warp_output ds transform =
+  let transform_t = Transform.get_transform_t transform in
+  let transform_f = Transform.get_transform_c transform in
+  let geo_transform =
+    Geo_transform.make
+      ~origin:(0.0, 0.0) ~pixel_size:(0.0, 0.0) ~rotation:(0.0, 0.0)
+  in
+  let pixels = allocate_n int ~count:1 in
+  let lines = allocate_n int ~count:1 in
+  suggested_warp_output (ptr void) ds transform_f transform_t (
+    let open Bigarray in
+    bigarray_start array1
+      (geo_transform :> (float, float64_elt, c_layout) Array1.t)
+  ) pixels lines;
+  { geo_transform; pixels = !@pixels; lines = !@lines }
+
 module Operation = struct
   type t = T.t
   let t = T.t
