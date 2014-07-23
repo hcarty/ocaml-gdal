@@ -30,6 +30,7 @@ module Options : sig
   val set_src_no_data_imag : t -> float list -> unit
   val set_dst_no_data_real : t -> float list -> unit
   val set_dst_no_data_real : t -> float list -> unit
+  val set_transformer : t -> Transform.t -> unit
   (** [set_* t ...] set warp option fields.  See the [gdalwarper.h]
       documentation for descriptions of the affected fields. *)
 
@@ -45,6 +46,7 @@ module Options : sig
     ?src_no_data_imag:float list ->
     ?dst_no_data_real:float list ->
     ?dst_no_data_imag:float list ->
+    ?transformer:Transform.t ->
     unit -> t
   (** Create and initialize warp options.  The arguments to [make] can be used
       to override GDAL's defaults.  The parameters match the [set_*] functions

@@ -43,7 +43,8 @@ module Options = struct
   let dst_no_data_imag = f "dst_no_data_imag" (ptr_opt double)
   let progress = f "progress" (ptr void)
   let progress_arg = f "progress_arg" (ptr void)
-  let transformer = f "transformer" (ptr void)
+  let transformer =
+    f "transformer" (Foreign.funptr (Transform.transform_t (ptr void)))
   let transformer_arg = f "transformer_arg" (ptr void)
   let src_per_band_validity_mask_func =
     f "src_per_band_validity_mask_func" (ptr void)
@@ -160,6 +161,13 @@ module Options = struct
   let set_dst_no_data_imag o l =
     set_band_dep o l dst_no_data_imag
 
+  let set_transformer o transform =
+    let c = Transform.get_transform_c transform in
+    let arg = Transform.get_transform_t transform in
+    setf !@o transformer c;
+    setf !@o transformer_arg arg;
+    ()
+
   let may f o =
     match o with
     | None -> ()
@@ -169,6 +177,7 @@ module Options = struct
       ?src ?dst ?bands
       ?src_no_data_real ?src_no_data_imag
       ?dst_no_data_real ?dst_no_data_imag
+      ?transformer
       () =
     let o = create () in
     let mayo f x = may (f o) x in
@@ -183,6 +192,7 @@ module Options = struct
     mayo set_src_no_data_imag src_no_data_imag;
     mayo set_dst_no_data_real dst_no_data_real;
     mayo set_dst_no_data_imag dst_no_data_imag;
+    mayo set_transformer transformer;
     o
 end
 
