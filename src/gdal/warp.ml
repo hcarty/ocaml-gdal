@@ -361,7 +361,7 @@ module Operation = struct
       match size with
       | Some s -> s
       | None ->
-        let ds = getf !@options Options.src_ds in
+        let ds = getf !@options Options.dst_ds in
         Data_set.get_x_size ds,
         Data_set.get_y_size ds
     in
