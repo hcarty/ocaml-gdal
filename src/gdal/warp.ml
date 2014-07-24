@@ -243,8 +243,7 @@ let auto_create_warped_vrt ?src_wkt ?dst_wkt ?(max_error = 0.0)
 
 type warp_output_t = {
   geo_transform : Geo_transform.t;
-  pixels : int;
-  lines : int;
+  dims : int * int;
 }
 
 let suggested_warp_output arg =
@@ -266,7 +265,7 @@ let suggested_warp_output ds transform =
     bigarray_start array1
       (geo_transform :> (float, float64_elt, c_layout) Array1.t)
   ) pixels lines;
-  { geo_transform; pixels = !@pixels; lines = !@lines }
+  { geo_transform; dims = !@pixels, !@lines }
 
 module Operation = struct
   type t = T.t

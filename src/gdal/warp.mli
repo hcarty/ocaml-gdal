@@ -104,8 +104,7 @@ end
 
 type warp_output_t = {
   geo_transform : Geo_transform.t;
-  pixels : int;
-  lines : int;
+  dims : int * int;
 }
 (** Suggested data set specifications for a warp destination *)
 
