@@ -51,6 +51,7 @@ let transform_ml c t forward (xs : data_t) (ys : data_t) (zs : data_t) =
 module Gen_img = struct
   type t = T.t
   let t = T.t
+  let t_opt = T.t_opt
 
   type reference_t = [
       `data_set of Data_set.t
@@ -65,11 +66,19 @@ module Gen_img = struct
     Lib.c "GDALCreateGenImgProjTransformer"
       (Data_set.t_opt @-> string_opt @-> Data_set.t_opt @-> string_opt @->
        int @-> double @-> int @->
-       returning t)
+       returning t_opt)
+
+  let create3 =
+    Lib.c "GDALCreateGenImgProjTransformer3"
+      (string @-> ptr double @-> string @-> ptr double @-> returning t_opt)
 
   let destroy =
     Lib.c "GDALDestroyGenImgProjTransformer"
       (t @-> returning void)
+
+  let set_dst_geo_transform =
+    Lib.c "GDALSetGenImgProjTransformerDstGeoTransform"
+      (t @-> ptr double @-> returning void)
 
   let c =
     transform_c "GDALGenImgProjTransform" t
@@ -77,19 +86,47 @@ module Gen_img = struct
   let ml t =
     transform_ml c t
 
-  let create ?gcp ~src ~dst =
+  let create_data_set src dst gcp_ok gcp_order =
+    create (Some src) None (Some dst) None gcp_ok 0.0 gcp_order
+
+  let create_data_set_wkt
+      src dst_wkt (dst_geo_transform : Geo_transform.t) gcp_ok gcp_order =
+    match create (Some src) None None (Some dst_wkt) gcp_ok 0.0 gcp_order with
+    | None -> None
+    | Some t as s ->
+      let gt = bigarray_start array1 (dst_geo_transform :> data_t) in
+      set_dst_geo_transform t gt;
+      s
+
+  let create_wkt_data_set src dst gcp_ok gcp_order =
+    create None (Some src) (Some dst) None gcp_ok 0.0 gcp_order
+
+  let create_wkt src_wkt src_geo_transform dst_wkt dst_geo_transform =
+    let ( !! ) (gt : Geo_transform.t) = bigarray_start array1 (gt :> data_t) in
+    create3 src_wkt !!src_geo_transform dst_wkt !!dst_geo_transform
+
+  let create ?gcp kind =
     let gcp_ok, gcp_order =
       match gcp with
-      | None -> false, 0
-      | Some (_ as g) -> g
+      | None -> true, 0
+      | Some g -> g
     in
     let gcp_ok = if gcp_ok then 1 else 0 in
-    let src_ds, src_wkt = tuple_of_transform src in
-    let dst_ds, dst_wkt = tuple_of_transform dst in
-    let t = create src_ds src_wkt dst_ds dst_wkt gcp_ok 0.0 gcp_order in
-    if t = null then raise Invalid_transform;
-    Gc.finalise destroy t;
-    t
+    let t =
+      match kind with
+      | `data_set (src, dst) -> create_data_set src dst gcp_ok gcp_order
+      | `wkt ((src_wkt, src_gt), (dst_wkt, dst_gt)) ->
+        create_wkt src_wkt src_gt dst_wkt dst_gt
+      | `data_set_wkt (src, (dst_wkt, dst_gt)) ->
+        create_data_set_wkt src dst_wkt dst_gt gcp_ok gcp_order
+      | `wkt_data_set (src, dst) ->
+        create_wkt_data_set src dst gcp_ok gcp_order
+    in
+    match t with
+    | None -> raise Invalid_transform
+    | Some t ->
+      Gc.finalise destroy t;
+      t
 end
 
 module Repojection = struct
@@ -121,8 +158,8 @@ type t =
   | Gen_img of Gen_img.t
   | Repojection of Repojection.t
 
-let make_gen_img ?gcp ~src ~dst =
-  let t = Gen_img.create ?gcp ~src ~dst in
+let make_gen_img ?gcp kind =
+  let t = Gen_img.create ?gcp kind in
   Gen_img t
 
 let make_reprojection ~src ~dst =

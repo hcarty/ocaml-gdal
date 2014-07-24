@@ -13,13 +13,23 @@ type t
 
 val make_gen_img :
   ?gcp:bool * int ->
-  src:[ `data_set of Data_set.t | `wkt of string ] ->
-  dst:[ `data_set of Data_set.t | `wkt of string ] ->
+  [
+    `data_set of Data_set.t * Data_set.t |
+    `wkt of (string * Geo_transform.t) * (string * Geo_transform.t) |
+    `data_set_wkt of Data_set.t * (string * Geo_transform.t) |
+    `wkt_data_set of string * Data_set.t
+  ] ->
   t
-(** [make_gen_img ?gcp ~src ~dst] creates a transformation definition between
-    the coordinate system of [src] and [dst].
+(** [make_gen_img ?gcp kind] creates a transformation defined by [kind].
 
-    @param gcp defaults to [(false, 0)].  See GDAL's
+    Options for [kind]:
+    - [`data_set (src, dst)]
+    - [`wkt ((src_wkt, src_geo_transform), (dst_wkt, dst_geo_transform))]
+      {i uses [GDALCreateGenImgTransformer3] internally, [gcp] is ignored)
+    - [`data_set_wkt (src, (dst_wkt, dst_geo_transform))]
+    - [`wkt_data_set (src_wkt, dst)]
+
+    @param gcp defaults to [(true, 0)].  See GDAL's
     [GDALCreateGenImgProjTransformer] documentation for an explanation of how
     GCPs may be used. *)
 
