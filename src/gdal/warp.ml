@@ -282,7 +282,7 @@ module Operation = struct
 
   let create options =
     let result = create options in
-    if result == null then
+    if result = null then
       raise Warp_error
     else (
       Gc.finalise destroy result;
