@@ -79,24 +79,22 @@ module Operation : sig
       to in the destination data source. *)
 
   val warp_region :
-    ?dst_offset:int * int ->
-    ?dst_size:int * int ->
-    ?src_offset:int * int ->
-    ?src_size:int * int ->
-    t -> unit
-  (** [warp_region ?dst_offset ?dst_size ?src_offset ?src_size op] warps the
-      defined region according to [op].
-
-      The optional parameters default to all zeroes which will result in the
-      entire image being warped. *)
+    t ->
+    dst_offset:int * int ->
+    dst_size:int * int ->
+    src_offset:int * int ->
+    src_size:int * int ->
+    unit
+  (** [warp_region op ~dst_offset ~dst_size ~src_offset ~src_size] warps the
+      defined region according to [op]. *)
 
   val warp_region_to_buffer :
-    ?dst_offset:int * int ->
-    ?dst_size:int * int ->
-    ?src_offset:int * int ->
-    ?src_size:int * int ->
     ?buffer:('e, 'v, Bigarray.c_layout) Bigarray.Array2.t ->
     t -> ('e, 'v) Band.Data.t ->
+    dst_offset:int * int ->
+    dst_size:int * int ->
+    src_offset:int * int ->
+    src_size:int * int ->
     ('e, 'v, Bigarray.c_layout) Bigarray.Array2.t
   (** [warp_region_to_buffer] is like {!warp_region} except that it writes
       the result to [buffer].

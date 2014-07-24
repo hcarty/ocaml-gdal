@@ -308,9 +308,7 @@ module Operation = struct
       (t @-> int @-> int @-> int @-> int @-> int @-> int @-> int @-> int @->
        returning err)
 
-  let warp_region ?(dst_offset = 0, 0) ?(dst_size = 0, 0)
-      ?(src_offset = 0, 0) ?(src_size = 0, 0)
-      o =
+  let warp_region o ~dst_offset ~dst_size ~src_offset ~src_size =
     let dox, doy = dst_offset in
     let dsx, dsy = dst_size in
     let sox, soy = src_offset in
@@ -324,10 +322,9 @@ module Operation = struct
        int @-> int @-> int @-> int @->
        returning err)
 
-  let warp_region_to_buffer ?(dst_offset = 0, 0) ?(dst_size = 0, 0)
-      ?(src_offset = 0, 0) ?(src_size = 0, 0)
-      ?buffer
-      o dt =
+  let warp_region_to_buffer
+      ?buffer o dt ~dst_offset ~dst_size ~src_offset ~src_size
+    =
     let open Bigarray in
     let dox, doy = dst_offset in
     let dsx, dsy = dst_size in
