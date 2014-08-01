@@ -8,18 +8,21 @@ type result_t =
   (int, Bigarray.int_elt, Bigarray.c_layout) Bigarray.Array1.t option
 (** Success/failure of coordinate transformations. *)
 
-type t
+type image
+type reprojection
+
+type 'a t
 (** Transformation *)
 
 val make_gen_img :
-  ?gcp:bool * int ->
+  ?gcp:int ->
   [
     `data_set of Data_set.t * Data_set.t |
     `wkt of (string * Geo_transform.t) * (string * Geo_transform.t) |
-    `data_set_wkt of Data_set.t * (string * Geo_transform.t) |
+    `data_set_wkt of Data_set.t * string |
     `wkt_data_set of string * Data_set.t
   ] ->
-  t
+  image t
 (** [make_gen_img ?gcp kind] creates a transformation defined by [kind].
 
     Options for [kind]:
@@ -33,11 +36,15 @@ val make_gen_img :
     [GDALCreateGenImgProjTransformer] documentation for an explanation of how
     GCPs may be used. *)
 
-val make_reprojection : src:string -> dst:string -> t
+val set_dst_geo_transform : image t -> Geo_transform.t -> unit
+(** [set_dst_geo_transform t gt] sets the destination geo transform matrix in
+    [t]. *)
+
+val make_reprojection : src:string -> dst:string -> reprojection t
 (** [make_reprojection ~src ~dst] creates a transformation definition between
     the WKT definition in [src] and the WKT definition in [dst]. *)
 
-val transform : t -> bool -> data_t -> data_t -> data_t -> result_t
+val transform : _ t -> bool -> data_t -> data_t -> data_t -> result_t
 (** [transform t invert xs ys zs] converts the coordinates [xs], [ys], [zs]
     according to the transformation defined in [t].
 
@@ -61,5 +68,5 @@ type 'a transform_t =
   'a -> int -> int -> float ptr -> float ptr -> float ptr -> int ptr -> int
 
 val transform_t : 'a typ -> 'a transform_t fn
-val get_transform_t : t -> unit ptr
-val get_transform_c : t -> unit ptr transform_t
+val get_transform_t : _ t -> unit ptr
+val get_transform_c : _ t -> unit ptr transform_t

@@ -30,7 +30,7 @@ module Options : sig
   val set_src_no_data_imag : t -> float list -> unit
   val set_dst_no_data_real : t -> float list -> unit
   val set_dst_no_data_real : t -> float list -> unit
-  val set_transformer : t -> Transform.t -> unit
+  val set_transformer : t -> _ Transform.t -> unit
   (** [set_* t ...] set warp option fields.  See the [gdalwarper.h]
       documentation for descriptions of the affected fields. *)
 
@@ -46,7 +46,7 @@ module Options : sig
     ?src_no_data_imag:float list ->
     ?dst_no_data_real:float list ->
     ?dst_no_data_imag:float list ->
-    ?transformer:Transform.t ->
+    ?transformer: _ Transform.t ->
     unit -> t
   (** Create and initialize warp options.  The arguments to [make] can be used
       to override GDAL's defaults.  The parameters match the [set_*] functions
@@ -108,7 +108,7 @@ type warp_output_t = {
 }
 (** Suggested data set specifications for a warp destination *)
 
-val suggested_warp_output : Data_set.t -> Transform.t -> warp_output_t
+val suggested_warp_output : Data_set.t -> _ Transform.t -> warp_output_t
 (** [suggested_warp_output ds transform] will suggest dimensions and
     {!Geo_transform.t} parameters for a destination data set to warp [ds] into
     based on the dimensions of [ds] and the parameters defined in

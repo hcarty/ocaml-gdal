@@ -9,6 +9,8 @@ type result_t =
 type 'a transform_t =
   'a -> int -> int -> float ptr -> float ptr -> float ptr -> int ptr -> int
 
+let ( !! ) (gt : Geo_transform.t) = bigarray_start array1 (gt :> data_t)
+
 let transform_t t =
   t @->
   int @-> int @->
@@ -89,27 +91,20 @@ module Gen_img = struct
   let create_data_set src dst gcp_ok gcp_order =
     create (Some src) None (Some dst) None gcp_ok 0.0 gcp_order
 
-  let create_data_set_wkt
-      src dst_wkt (dst_geo_transform : Geo_transform.t) gcp_ok gcp_order =
-    match create (Some src) None None (Some dst_wkt) gcp_ok 0.0 gcp_order with
-    | None -> None
-    | Some t as s ->
-      let gt = bigarray_start array1 (dst_geo_transform :> data_t) in
-      set_dst_geo_transform t gt;
-      s
+  let create_data_set_wkt src dst_wkt gcp_ok gcp_order =
+    create (Some src) None None (Some dst_wkt) gcp_ok 0.0 gcp_order
 
   let create_wkt_data_set src dst gcp_ok gcp_order =
     create None (Some src) (Some dst) None gcp_ok 0.0 gcp_order
 
   let create_wkt src_wkt src_geo_transform dst_wkt dst_geo_transform =
-    let ( !! ) (gt : Geo_transform.t) = bigarray_start array1 (gt :> data_t) in
     create3 src_wkt !!src_geo_transform dst_wkt !!dst_geo_transform
 
   let create ?gcp kind =
     let gcp_ok, gcp_order =
       match gcp with
-      | None -> true, 0
-      | Some g -> g
+      | None -> false, 0
+      | Some g -> true, g
     in
     let gcp_ok = if gcp_ok then 1 else 0 in
     let t =
@@ -117,8 +112,8 @@ module Gen_img = struct
       | `data_set (src, dst) -> create_data_set src dst gcp_ok gcp_order
       | `wkt ((src_wkt, src_gt), (dst_wkt, dst_gt)) ->
         create_wkt src_wkt src_gt dst_wkt dst_gt
-      | `data_set_wkt (src, (dst_wkt, dst_gt)) ->
-        create_data_set_wkt src dst_wkt dst_gt gcp_ok gcp_order
+      | `data_set_wkt (src, dst_wkt) ->
+        create_data_set_wkt src dst_wkt gcp_ok gcp_order
       | `wkt_data_set (src, dst) ->
         create_wkt_data_set src dst gcp_ok gcp_order
     in
@@ -129,7 +124,7 @@ module Gen_img = struct
       t
 end
 
-module Repojection = struct
+module Reprojection = struct
   type t = T.t
   let t = T.t
 
@@ -154,26 +149,35 @@ module Repojection = struct
     t
 end
 
-type t =
-  | Gen_img of Gen_img.t
-  | Repojection of Repojection.t
+type image
+type reprojection
+
+type _ t =
+  | Gen_img : Gen_img.t -> image t
+  | Repojection : Reprojection.t -> reprojection t
 
 let make_gen_img ?gcp kind =
   let t = Gen_img.create ?gcp kind in
   Gen_img t
 
+let set_dst_geo_transform (Gen_img t) (gt : Geo_transform.t) =
+  Gen_img.set_dst_geo_transform t !!gt
+
 let make_reprojection ~src ~dst =
-  let t = Repojection.create ~src ~dst in
+  let t = Reprojection.create ~src ~dst in
   Repojection t
 
-let transform = function
+let transform (type s) (t : s t) =
+  match t with
   | Gen_img g -> Gen_img.ml g
-  | Repojection r -> Repojection.ml r
+  | Repojection r -> Reprojection.ml r
 
-let get_transform_t = function
+let get_transform_t (type s) (t : s t) =
+  match t with
   | Gen_img g -> g
   | Repojection r -> r
 
-let get_transform_c = function
+let get_transform_c (type s) (t : s t) =
+  match t with
   | Gen_img _ -> Gen_img.c
-  | Repojection _ -> Repojection.c
+  | Repojection _ -> Reprojection.c
