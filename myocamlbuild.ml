@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 7c1f5df8ad49238e45deac918be04b96) *)
+(* DO NOT EDIT (digest: 0fd0fed354a5f18eb4505d7ae4d0264e) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -599,7 +599,7 @@ let package_default =
        [("ogr", ["src/ogr"], []); ("gdal", ["src/gdal"], [])];
      lib_c = [];
      flags = [];
-     includes = [("examples", ["src/ogr"])]
+     includes = [("examples", ["src/gdal"; "src/ogr"])]
   }
   ;;
 

@@ -10,27 +10,27 @@ type resample_t =
 exception Warp_error
 
 module Options : sig
-  type t
+  type 'a t
 
-  val create : unit -> t
+  val create : unit -> 'a t
   (** [create ()] creates a warping options value initialized with sane
       defaults. *)
 
-  val clone : t -> t
+  val clone : 'a t -> 'a t
   (** [clone t] returns a copy of [t]. *)
 
-  val set_warp_options : t -> string list -> unit
-  val set_memory_limit : t -> float -> unit
-  val set_resample_alg : t -> resample_t -> unit
-  val set_working_data_type : t -> (_, _) Band.Data.t -> unit
-  val set_src : t -> Data_set.t -> unit
-  val set_dst : t -> Data_set.t -> unit
-  val set_bands : t -> (int * int) list -> unit
-  val set_src_no_data_real : t -> float list -> unit
-  val set_src_no_data_imag : t -> float list -> unit
-  val set_dst_no_data_real : t -> float list -> unit
-  val set_dst_no_data_real : t -> float list -> unit
-  val set_transformer : t -> _ Transform.t -> unit
+  val set_warp_options : 'a t -> string list -> unit
+  val set_memory_limit : 'a t -> float -> unit
+  val set_resample_alg : 'a t -> resample_t -> unit
+  val set_working_data_type : 'a t -> (_, _) Band.Data.t -> unit
+  val set_src : 'a t -> Data_set.t -> unit
+  val set_dst : 'a t -> Data_set.t -> unit
+  val set_bands : 'a t -> (int * int) list -> unit
+  val set_src_no_data_real : 'a t -> float list -> unit
+  val set_src_no_data_imag : 'a t -> float list -> unit
+  val set_dst_no_data_real : 'a t -> float list -> unit
+  val set_dst_no_data_real : 'a t -> float list -> unit
+  val set_transformer : 'a t -> 'a Transform.t -> unit
   (** [set_* t ...] set warp option fields.  See the [gdalwarper.h]
       documentation for descriptions of the affected fields. *)
 
@@ -46,8 +46,8 @@ module Options : sig
     ?src_no_data_imag:float list ->
     ?dst_no_data_real:float list ->
     ?dst_no_data_imag:float list ->
-    ?transformer: _ Transform.t ->
-    unit -> t
+    ?transformer: 'a Transform.t ->
+    unit -> 'a t
   (** Create and initialize warp options.  The arguments to [make] can be used
       to override GDAL's defaults.  The parameters match the [set_*] functions
       above. *)
@@ -56,18 +56,18 @@ end
 module Operation : sig
   (** {2 Warp Operations} *)
 
-  type t
+  type 'a t
 
-  val create : Options.t -> t
+  val create : 'a Options.t -> 'a t
   (** [create o] creates a warp operation value based on the given options. *)
 
-  val warp : ?offset:int * int -> ?size:int * int -> Options.t -> unit
-  val warp_multi : ?offset:int * int -> ?size:int * int -> Options.t -> unit
+  val warp : ?offset:int * int -> ?size:int * int -> _ Options.t -> unit
+  val warp_multi : ?offset:int * int -> ?size:int * int -> _ Options.t -> unit
   (** Convenience functions for carrying out a warping operation.  They use the
       [chunk_and_warp_*] functions internally. *)
 
-  val chunk_and_warp_image : t -> offset:int * int -> size:int * int -> unit
-  val chunk_and_warp_multi : t -> offset:int * int -> size:int * int -> unit
+  val chunk_and_warp_image : _ t -> offset:int * int -> size:int * int -> unit
+  val chunk_and_warp_multi : _ t -> offset:int * int -> size:int * int -> unit
   (** [chunk_and_warp_* t ~offset ~size] carry out the warp operation [t] by
       chopping up the processing into chunks which are small enough to fit in
       the memory limits specified in the {!Options.t} value used to create
@@ -79,7 +79,7 @@ module Operation : sig
       to in the destination data source. *)
 
   val warp_region :
-    t ->
+    _ t ->
     dst_offset:int * int ->
     dst_size:int * int ->
     src_offset:int * int ->
@@ -90,7 +90,7 @@ module Operation : sig
 
   val warp_region_to_buffer :
     ?buffer:('e, 'v, Bigarray.c_layout) Bigarray.Array2.t ->
-    t -> ('e, 'v) Band.Data.t ->
+    _ t -> ('e, 'v) Band.Data.t ->
     dst_offset:int * int ->
     dst_size:int * int ->
     src_offset:int * int ->
@@ -117,7 +117,7 @@ val suggested_warp_output : Data_set.t -> _ Transform.t -> warp_output_t
 val reproject_image :
   ?memory_limit:float ->
   ?max_error:float ->
-  ?options:Options.t ->
+  ?options:_ Options.t ->
   ?src_wkt:string ->
   ?dst_wkt:string ->
   src:Data_set.t ->
@@ -139,7 +139,7 @@ val reproject_image :
 val create_and_reproject_image :
   ?memory_limit:float ->
   ?max_error:float ->
-  ?options:Options.t ->
+  ?options:_ Options.t ->
   ?src_wkt:string ->
   ?dst_wkt:string ->
   ?create_options:string list ->
@@ -168,7 +168,7 @@ val auto_create_warped_vrt :
   ?src_wkt:string ->
   ?dst_wkt:string ->
   ?max_error:float ->
-  ?options:Options.t ->
+  ?options:_ Options.t ->
   Data_set.t ->
   resample_t ->
   Data_set.t

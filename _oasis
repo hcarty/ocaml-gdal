@@ -52,6 +52,14 @@ Executable sanity
   Install:        false
   CompiledObject: best
 
+Executable warptut
+  Path:           examples
+  MainIs:         warptut.ml
+  Build$:         flag(examples)
+  BuildDepends:   ogr, gdal
+  Install:        false
+  CompiledObject: best
+
 SourceRepository master
   Type:     git
   Location: https://github.com/hcarty/ocaml-gdal.git
