@@ -82,6 +82,7 @@ module Options = struct
         (void @-> returning (ptr t))
 
     let destroy =
+      (* here is your problem (1): This functions frees everything*)
       Lib.c "GDALDestroyWarpOptions"
         (ptr t @-> returning void)
 
@@ -155,6 +156,9 @@ module Options = struct
     let dst = CArray.of_list int dst in
     let n = CArray.length src in
     setf !@(o.o) Raw.band_count n;
+    (* now, don't do this. CArrays are already managed by finalizers. 
+       But GDALDestroyWarpOptions consider this memory as its own and 
+       will free it too *)
     setf !@(o.o) Raw.src_bands (CArray.start src);
     setf !@(o.o) Raw.dst_bands (CArray.start dst);
     o.src_bands <- Some src;
