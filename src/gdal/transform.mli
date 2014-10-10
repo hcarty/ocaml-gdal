@@ -28,7 +28,7 @@ val make_gen_img :
     Options for [kind]:
     - [`data_set (src, dst)]
     - [`wkt ((src_wkt, src_geo_transform), (dst_wkt, dst_geo_transform))]
-      {i uses [GDALCreateGenImgTransformer3] internally, [gcp] is ignored)
+      {i uses [GDALCreateGenImgTransformer3] internally, [gcp] is ignored}
     - [`data_set_wkt (src, (dst_wkt, dst_geo_transform))]
     - [`wkt_data_set (src_wkt, dst)]
 
