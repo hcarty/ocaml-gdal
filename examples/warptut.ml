@@ -74,11 +74,6 @@ let () =
   (* Warp all bands *)
   let bands = Array.init dst_bands (fun i -> i + 1, i + 1) |> Array.to_list in
 
-  let say x = prerr_endline x in
-
-  say "Gc 1";
-  Gc.full_major ();
-
   let warp_options =
     Gdal.Warp.Options.make
       ~resample_alg:Gdal.Warp.Nearest_neighbor
@@ -89,16 +84,8 @@ let () =
       ()
   in
 
-  say "Gc 2";
-  Gc.full_major ();
-
-  say "Pre-warp";
   (* Warp it! *)
   Gdal.Warp.Operation.warp warp_options;
-  say "Post-warp";
-
-  say "Gc 3";
-  Gc.full_major ();
 
   (* Close the input and output sets *)
   Gdal.Data_set.close src_ds;
