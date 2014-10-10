@@ -15,7 +15,7 @@ type 'a t
 (** Transformation *)
 
 val make_gen_img :
-  ?gcp:int ->
+  ?gcp:bool * int ->
   [
     `data_set of Data_set.t * Data_set.t |
     `wkt of (string * Geo_transform.t) * (string * Geo_transform.t) |

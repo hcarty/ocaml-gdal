@@ -103,8 +103,8 @@ module Gen_img = struct
   let create ?gcp kind =
     let gcp_ok, gcp_order =
       match gcp with
-      | None -> false, 0
-      | Some g -> true, g
+      | None -> true, 0
+      | Some g -> g
     in
     let gcp_ok = if gcp_ok then 1 else 0 in
     let t =
