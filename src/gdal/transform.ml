@@ -74,10 +74,6 @@ module Gen_img = struct
     Lib.c "GDALCreateGenImgProjTransformer3"
       (string @-> ptr double @-> string @-> ptr double @-> returning t_opt)
 
-  let destroy =
-    Lib.c "GDALDestroyGenImgProjTransformer"
-      (t @-> returning void)
-
   let set_dst_geo_transform =
     Lib.c "GDALSetGenImgProjTransformerDstGeoTransform"
       (t @-> ptr double @-> returning void)
@@ -119,9 +115,7 @@ module Gen_img = struct
     in
     match t with
     | None -> raise Invalid_transform
-    | Some t ->
-      Gc.finalise destroy t;
-      t
+    | Some t -> t
 end
 
 module Reprojection = struct

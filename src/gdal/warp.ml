@@ -81,23 +81,9 @@ module Options = struct
       Lib.c "GDALCreateWarpOptions"
         (void @-> returning (ptr t))
 
-    let destroy =
-      Lib.c "GDALDestroyWarpOptions"
-        (ptr t @-> returning void)
-
-    let create () =
-      let o = create () in
-      Gc.finalise destroy o;
-      o
-
     let clone =
       Lib.c "GDALCloneWarpOptions"
         (ptr t @-> returning (ptr t))
-
-    let clone t =
-      let o = clone t in
-      Gc.finalise destroy o;
-      o
   end
 
   exception Band_count_mismatch
