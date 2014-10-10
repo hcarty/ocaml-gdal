@@ -372,9 +372,9 @@ let iter t f =
         for pixel_col = 0 to pixel_cols - 1 do
           let col = block_col * block_cols + pixel_col in
           let row = block_row * block_rows + pixel_row in
-          let v = data.{row, col} in
+          let v = data.{pixel_row, pixel_col} in
           let result = f col row v in
-          data.{row, col} <- result;
+          data.{pixel_row, pixel_col} <- result;
         done;
       done;
       ()
@@ -391,7 +391,7 @@ let iter_read t f =
         for pixel_col = 0 to pixel_cols - 1 do
           let col = block_col * block_cols + pixel_col in
           let row = block_row * block_rows + pixel_row in
-          let v = data.{row, col} in
+          let v = data.{pixel_row, pixel_col} in
           f col row v;
         done;
       done;
@@ -410,7 +410,7 @@ let iter_write t f =
           let col = block_col * block_cols + pixel_col in
           let row = block_row * block_rows + pixel_row in
           let result = f col row in
-          data.{row, col} <- result;
+          data.{pixel_row, pixel_col} <- result;
         done;
       done;
       ()
