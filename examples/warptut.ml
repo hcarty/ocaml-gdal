@@ -47,7 +47,7 @@ let () =
 
   (* Create a transformer that maps from source pixel/line coordinates to
      destination georeferenced coordinates (not destination pixel/line).  We do
-     by omitting the destination dataset handle. *)
+     this by omitting the destination dataset handle. *)
   let transform =
     Gdal.Transform.make_gen_img @@ `data_set_wkt (src_ds, dst_wkt)
   in
