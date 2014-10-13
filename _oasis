@@ -28,7 +28,8 @@ Library ogr
 Library gdal
   Path:            src/gdal
   BuildDepends:    ctypes.foreign (>= 0.3),
-                   bigarray
+                   bigarray,
+                   ogr
   Modules:         Gdal,
                    Gdal_alg,
                    Gdal_band,

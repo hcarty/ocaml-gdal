@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: d30d0f23c409e8c5bd7bbbff8f8c6f26)
+# DO NOT EDIT (digest: f7ce233f56a70f7b83b87d5e88a97ec8)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -20,6 +20,7 @@
 "src/gdal/gdal.cmxs": use_gdal
 <src/gdal/*.ml{,i}>: package(bigarray)
 <src/gdal/*.ml{,i}>: package(ctypes.foreign)
+<src/gdal/*.ml{,i}>: use_ogr
 # Executable sanity
 <examples/sanity.{native,byte}>: package(ctypes.foreign)
 <examples/sanity.{native,byte}>: use_ogr
