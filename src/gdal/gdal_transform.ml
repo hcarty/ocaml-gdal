@@ -1,5 +1,10 @@
 open Ctypes
 
+module T = Gdal_t
+module Lib = Gdal_lib
+module Geo_transform = Gdal_geo_transform
+module Data_set = Gdal_data_set
+
 exception Invalid_transform
 
 type data_t = (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t

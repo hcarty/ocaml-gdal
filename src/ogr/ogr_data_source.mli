@@ -37,9 +37,9 @@ val with_source_exn : ?write:bool -> string -> (t -> 'a) -> 'a
 (** Like {!with_source} but raises {!Invalid_source} if there is an error with
     the data source. *)
 
-val get_layer_by_name : t -> string -> Layer.t
-val get_layer : t -> int -> Layer.t
-(** [get_layer* src id] returns a {!Layer.t} extracted from [src]. *)
+val get_layer_by_name : t -> string -> Ogr_layer.t
+val get_layer : t -> int -> Ogr_layer.t
+(** [get_layer* src id] returns a {!Ogr_layer.t} extracted from [src]. *)
 
 (**/**)
 

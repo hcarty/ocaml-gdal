@@ -1,4 +1,13 @@
 # OASIS_START
-# DO NOT EDIT (digest: 4d9a512eea9b2ca6d8c432a016675ba4)
+# DO NOT EDIT (digest: fac3168fbb4f4eadade2b79405432bea)
 Ogr
+Ogr_data_source
+Ogr_driver
+Ogr_feature
+Ogr_field
+Ogr_geometry
+Ogr_layer
+Ogr_lib
+Ogr_spatial_reference
+Ogr_t
 # OASIS_STOP

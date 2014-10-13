@@ -1,6 +1,9 @@
 open Ctypes
 open Foreign
 
+module T = Gdal_t
+module Lib = Gdal_lib
+
 exception Invalid_driver
 
 type t = T.t

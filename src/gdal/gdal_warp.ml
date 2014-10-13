@@ -1,5 +1,13 @@
 open Ctypes
 
+module T = Gdal_t
+module Lib = Gdal_lib
+module Data_set = Gdal_data_set
+module Driver = Gdal_driver
+module Band = Gdal_band
+module Transform = Gdal_transform
+module Geo_transform = Gdal_geo_transform
+
 exception Warp_error
 
 let err = T.err Warp_error

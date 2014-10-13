@@ -1,4 +1,14 @@
 # OASIS_START
-# DO NOT EDIT (digest: 7ca684c2f6c406e57928472063394eb4)
+# DO NOT EDIT (digest: 1c8dc6aa8b6c0500b6dd00d918461417)
 Gdal
+Gdal_alg
+Gdal_band
+Gdal_data_set
+Gdal_driver
+Gdal_geo_transform
+Gdal_lib
+Gdal_transform
+Gdal_vsi
+Gdal_warp
+Gdal_t
 # OASIS_STOP

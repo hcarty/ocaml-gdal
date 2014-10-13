@@ -1,6 +1,13 @@
 open Ctypes
 open Foreign
 
+module T = Ogr_t
+module Lib = Ogr_lib
+module Geometry = Ogr_geometry
+module Feature = Ogr_feature
+module Spatial_reference = Ogr_spatial_reference
+module Field = Ogr_field
+
 type t = T.t
 let t = T.t
 

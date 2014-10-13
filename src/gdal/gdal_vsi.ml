@@ -1,5 +1,8 @@
 open Ctypes
 
+module T = Gdal_t
+module Lib = Gdal_lib
+
 type t = T.t
 let t = T.t
 let t_opt = T.t_opt

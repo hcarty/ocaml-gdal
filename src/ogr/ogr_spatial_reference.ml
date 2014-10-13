@@ -1,6 +1,9 @@
 open Ctypes
 open Foreign
 
+module T = Ogr_t
+module Lib = Ogr_lib
+
 exception Spatial_reference_error
 
 type t = T.t

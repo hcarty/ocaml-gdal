@@ -22,15 +22,15 @@ module Options : sig
   val set_warp_options : 'a t -> string list -> unit
   val set_memory_limit : 'a t -> float -> unit
   val set_resample_alg : 'a t -> resample_t -> unit
-  val set_working_data_type : 'a t -> (_, _) Band.Data.t -> unit
-  val set_src : 'a t -> Data_set.t -> unit
-  val set_dst : 'a t -> Data_set.t -> unit
+  val set_working_data_type : 'a t -> (_, _) Gdal_band.Data.t -> unit
+  val set_src : 'a t -> Gdal_data_set.t -> unit
+  val set_dst : 'a t -> Gdal_data_set.t -> unit
   val set_bands : 'a t -> (int * int) list -> unit
   val set_src_no_data_real : 'a t -> float list -> unit
   val set_src_no_data_imag : 'a t -> float list -> unit
   val set_dst_no_data_real : 'a t -> float list -> unit
   val set_dst_no_data_real : 'a t -> float list -> unit
-  val set_transformer : 'a t -> 'a Transform.t -> unit
+  val set_transformer : 'a t -> 'a Gdal_transform.t -> unit
   (** [set_* t ...] set warp option fields.  See the [gdalwarper.h]
       documentation for descriptions of the affected fields. *)
 
@@ -38,15 +38,15 @@ module Options : sig
     ?warp_options:string list ->
     ?memory_limit:float ->
     ?resample_alg:resample_t ->
-    ?working_data_type:(_, _) Band.Data.t ->
-    ?src:Data_set.t ->
-    ?dst:Data_set.t ->
+    ?working_data_type:(_, _) Gdal_band.Data.t ->
+    ?src:Gdal_data_set.t ->
+    ?dst:Gdal_data_set.t ->
     ?bands:(int * int) list ->
     ?src_no_data_real:float list ->
     ?src_no_data_imag:float list ->
     ?dst_no_data_real:float list ->
     ?dst_no_data_imag:float list ->
-    ?transformer: 'a Transform.t ->
+    ?transformer: 'a Gdal_transform.t ->
     unit -> 'a t
   (** Create and initialize warp options.  The arguments to [make] can be used
       to override GDAL's defaults.  The parameters match the [set_*] functions
@@ -90,7 +90,7 @@ module Operation : sig
 
   val warp_region_to_buffer :
     ?buffer:('e, 'v, Bigarray.c_layout) Bigarray.Array2.t ->
-    _ t -> ('e, 'v) Band.Data.t ->
+    _ t -> ('e, 'v) Gdal_band.Data.t ->
     dst_offset:int * int ->
     dst_size:int * int ->
     src_offset:int * int ->
@@ -103,14 +103,14 @@ module Operation : sig
 end
 
 type warp_output_t = {
-  geo_transform : Geo_transform.t;
+  geo_transform : Gdal_geo_transform.t;
   dims : int * int;
 }
 (** Suggested data set specifications for a warp destination *)
 
-val suggested_warp_output : Data_set.t -> _ Transform.t -> warp_output_t
+val suggested_warp_output : Gdal_data_set.t -> _ Gdal_transform.t -> warp_output_t
 (** [suggested_warp_output ds transform] will suggest dimensions and
-    {!Geo_transform.t} parameters for a destination data set to warp [ds] into
+    {!Gdal_geo_transform.t} parameters for a destination data set to warp [ds] into
     based on the dimensions of [ds] and the parameters defined in
     [transform]. *)
 
@@ -120,8 +120,8 @@ val reproject_image :
   ?options:_ Options.t ->
   ?src_wkt:string ->
   ?dst_wkt:string ->
-  src:Data_set.t ->
-  dst:Data_set.t ->
+  src:Gdal_data_set.t ->
+  dst:Gdal_data_set.t ->
   resample_t ->
   unit
 (** [reproject_image ?memory_limit ?max_error ?options ?src_wkt ?dst_wkt ~src ~dst alg]
@@ -143,9 +143,9 @@ val create_and_reproject_image :
   ?src_wkt:string ->
   ?dst_wkt:string ->
   ?create_options:string list ->
-  Data_set.t ->
+  Gdal_data_set.t ->
   filename:string ->
-  Driver.t ->
+  Gdal_driver.t ->
   resample_t ->
   unit
 (** [create_and_reproject_image ?memory_limit ?max_error ?options
@@ -169,9 +169,9 @@ val auto_create_warped_vrt :
   ?dst_wkt:string ->
   ?max_error:float ->
   ?options:_ Options.t ->
-  Data_set.t ->
+  Gdal_data_set.t ->
   resample_t ->
-  Data_set.t
+  Gdal_data_set.t
 (** [auto_create_warped_vrt ?src_wkt ?dst_wkt ?max_error ?options src alg]
     creates a virtual dataset warped from [src].
 

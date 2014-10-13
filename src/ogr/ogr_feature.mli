@@ -13,7 +13,7 @@ val get_as_double : t -> int -> float
 val get_as_string : t -> int -> string
 (** [get_as_* t i] returns field [i] from feature [t]. *)
 
-val get_geometry_ref : t -> Geometry.t
+val get_geometry_ref : t -> Ogr_geometry.t
 (** [get_geometry_ref t] returns the geometry associated with [t]. *)
 
 val destroy : t -> unit
@@ -33,6 +33,6 @@ module Defn : sig
   (** [get_field_count t] returns the number of fields associated with the
       feature definition [t]. *)
 
-  val get_field_defn : t -> int -> Field.Defn.t
-  (** [get_field_defn t i] returns the [i]th {!Field.Defn.t} from [t]. *)
+  val get_field_defn : t -> int -> Ogr_field.Defn.t
+  (** [get_field_defn t i] returns the [i]th {!Ogr_field.Defn.t} from [t]. *)
 end

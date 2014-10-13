@@ -1,5 +1,8 @@
 (** {1 GDAL Data Sets} *)
 
+module Driver = Gdal_driver
+module Band = Gdal_band
+
 type t
 val t : t Ctypes.typ
 val t_opt : t option Ctypes.typ

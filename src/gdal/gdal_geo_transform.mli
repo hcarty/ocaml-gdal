@@ -2,7 +2,7 @@ type t =
   private (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t
 (** Pixel <-> coordinate transformation *)
 
-val get : Data_set.t -> t
+val get : Gdal_data_set.t -> t
 (** [get t] returns the geotransform array associated with [t]. *)
 
 val get_origin : t -> float * float
@@ -22,7 +22,7 @@ val make :
 (** [make ~origin ~pixel_size ~rotation] creates a geotransform
     with the given specifications. *)
 
-val set : Data_set.t -> t -> unit
+val set : Gdal_data_set.t -> t -> unit
 (** [set t] sets the geotransform array for [t]. *)
 
 val apply : t -> x:float -> y:float -> float * float

@@ -1,5 +1,9 @@
 open Ctypes
 open Foreign
+
+module T = Ogr_t
+module Lib = Ogr_lib
+
 module Defn = struct
   type t = T.Defn.t
   let t = T.Defn.t

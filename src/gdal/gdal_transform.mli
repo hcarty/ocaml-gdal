@@ -17,10 +17,10 @@ type 'a t
 val make_gen_img :
   ?gcp:bool * int ->
   [
-    `data_set of Data_set.t * Data_set.t |
-    `wkt of (string * Geo_transform.t) * (string * Geo_transform.t) |
-    `data_set_wkt of Data_set.t * string |
-    `wkt_data_set of string * Data_set.t
+    `data_set of Gdal_data_set.t * Gdal_data_set.t |
+    `wkt of (string * Gdal_geo_transform.t) * (string * Gdal_geo_transform.t) |
+    `data_set_wkt of Gdal_data_set.t * string |
+    `wkt_data_set of string * Gdal_data_set.t
   ] ->
   image t
 (** [make_gen_img ?gcp kind] creates a transformation defined by [kind].
@@ -36,7 +36,7 @@ val make_gen_img :
     [GDALCreateGenImgProjTransformer] documentation for an explanation of how
     GCPs may be used. *)
 
-val set_dst_geo_transform : image t -> Geo_transform.t -> unit
+val set_dst_geo_transform : image t -> Gdal_geo_transform.t -> unit
 (** [set_dst_geo_transform t gt] sets the destination geo transform matrix in
     [t]. *)
 

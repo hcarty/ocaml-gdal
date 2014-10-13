@@ -1,6 +1,11 @@
 open Ctypes
 open Foreign
 
+module T = Ogr_t
+module Lib = Ogr_lib
+module Driver = Ogr_driver
+module Layer = Ogr_layer
+
 type t = T.t
 let t = T.t
 

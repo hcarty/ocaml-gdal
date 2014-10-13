@@ -1,5 +1,8 @@
 open Ctypes
 
+module T = Gdal_t
+module Lib = Gdal_lib
+
 type c = T.t
 type ('v, 'e) t = c * ('v, 'e) Bigarray.kind
 let t = T.t

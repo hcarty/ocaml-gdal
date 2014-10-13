@@ -2,13 +2,13 @@
 
 exception Algorithm_error
 
-val proximity : ?options:string list -> src:(_, _) Band.t -> test:(_, _) Band.t -> unit
+val proximity : ?options:string list -> src:(_, _) Gdal_band.t -> test:(_, _) Gdal_band.t -> unit
 (** [proximity ?options ~src ~test] computes the pixel-by-pixel proximity
     between [src] and [test]. *)
 
 val fill_nodata :
   ?options:string list ->
-  target:(_, _) Band.t -> mask:(_, _) Band.t -> float -> int -> unit
+  target:(_, _) Gdal_band.t -> mask:(_, _) Gdal_band.t -> float -> int -> unit
 (** [fill_nodata ?options ~target ~mask distance iterations] will fill in
     [target]'s missing data pixels.  See GDAL's [GDALFillNoData] documentation
     for an explanation of the function parameters. *)
@@ -58,7 +58,7 @@ module Grid : sig
     interpolate_t ->
     (float * float * float) list ->
     xrange:int * float * float ->
-    yrange:int * float * float -> ('v, 'e) Band.Data.t ->
+    yrange:int * float * float -> ('v, 'e) Gdal_band.Data.t ->
     ('v, 'e, Bigarray.c_layout) Bigarray.Array2.t
   (** [make interp points ~xrange ~yrange kind] interpolates the data in
       [points] onto a regular grid specified by [xrange] and [yrange].

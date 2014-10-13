@@ -1,5 +1,9 @@
 open Ctypes
 
+module T = Gdal_t
+module Lib = Gdal_lib
+module Data_set = Gdal_data_set
+
 exception Geo_transform_error
 
 let err = T.err Geo_transform_error

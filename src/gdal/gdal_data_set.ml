@@ -1,5 +1,10 @@
 open Ctypes
 
+module T = Gdal_t
+module Lib = Gdal_lib
+module Driver = Gdal_driver
+module Band = Gdal_band
+
 type t = T.t
 let t = T.t
 
