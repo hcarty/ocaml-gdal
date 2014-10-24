@@ -29,7 +29,7 @@ module Options : sig
   val set_src_no_data_real : 'a t -> float list -> unit
   val set_src_no_data_imag : 'a t -> float list -> unit
   val set_dst_no_data_real : 'a t -> float list -> unit
-  val set_dst_no_data_real : 'a t -> float list -> unit
+  val set_dst_no_data_imag : 'a t -> float list -> unit
   val set_transformer : 'a t -> 'a Gdal_transform.t -> unit
   (** [set_* t ...] set warp option fields.  See the [gdalwarper.h]
       documentation for descriptions of the affected fields. *)
