@@ -1,8 +1,9 @@
 # OASIS_START
-# DO NOT EDIT (digest: f7ce233f56a70f7b83b87d5e88a97ec8)
+# DO NOT EDIT (digest: a7e2ae10cdca1bbe1dbc80b564f979ae)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
+true: annot, bin_annot
 <**/.svn>: -traverse
 <**/.svn>: not_hygienic
 ".bzr": -traverse
@@ -15,12 +16,12 @@
 "_darcs": not_hygienic
 # Library ogr
 "src/ogr/ogr.cmxs": use_ogr
-<src/ogr/*.ml{,i}>: package(ctypes.foreign)
+<src/ogr/*.ml{,i,y}>: package(ctypes.foreign)
 # Library gdal
 "src/gdal/gdal.cmxs": use_gdal
-<src/gdal/*.ml{,i}>: package(bigarray)
-<src/gdal/*.ml{,i}>: package(ctypes.foreign)
-<src/gdal/*.ml{,i}>: use_ogr
+<src/gdal/*.ml{,i,y}>: package(bigarray)
+<src/gdal/*.ml{,i,y}>: package(ctypes.foreign)
+<src/gdal/*.ml{,i,y}>: use_ogr
 # Executable sanity
 <examples/sanity.{native,byte}>: package(ctypes.foreign)
 <examples/sanity.{native,byte}>: use_ogr
@@ -29,8 +30,8 @@
 <examples/warptut.{native,byte}>: package(ctypes.foreign)
 <examples/warptut.{native,byte}>: use_gdal
 <examples/warptut.{native,byte}>: use_ogr
-<examples/*.ml{,i}>: package(bigarray)
-<examples/*.ml{,i}>: package(ctypes.foreign)
-<examples/*.ml{,i}>: use_gdal
-<examples/*.ml{,i}>: use_ogr
+<examples/*.ml{,i,y}>: package(bigarray)
+<examples/*.ml{,i,y}>: package(ctypes.foreign)
+<examples/*.ml{,i,y}>: use_gdal
+<examples/*.ml{,i,y}>: use_ogr
 # OASIS_STOP
