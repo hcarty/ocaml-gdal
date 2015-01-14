@@ -3,6 +3,8 @@ open Ctypes
 module T = Gdal_t
 module Lib = Gdal_lib
 module Band = Gdal_band
+module Data_set = Gdal_data_set
+module Transform = Gdal_transform
 
 exception Algorithm_error
 
@@ -187,4 +189,63 @@ module Grid = struct
       (bigarray_start array2 ba |> to_voidp)
       null null;
     ba
+end
+
+module Vector = struct
+  let generate_contours =
+    Lib.c "GDALContourGenerate" (
+      Band.t @-> double @-> double @-> int @-> ptr double @->
+      int @-> double @->
+      Ogr.Layer.t @-> int @-> int @-> ptr void @-> ptr void @-> returning err
+    )
+
+  let generate_contours ?no_data ?id ?elevation band layer contours =
+    let id = match id with Some x -> x | None -> ~-1 in
+    let elevation = match elevation with Some x -> x | None -> ~-1 in
+    let use_no_data, no_data =
+      match no_data with
+      | Some n -> true, n
+      | None -> false, nan
+    in
+    let contour_base, contour_interval, levels =
+      match contours with
+      | `fixed l -> 0.0, 0.0, l
+      | `interval (base, interval) -> base, interval, []
+    in
+    let levels = CArray.of_list double levels in
+    let n_levels = CArray.length levels in
+    let levels_ptr = CArray.start levels in
+    let band = fst band in
+    generate_contours band contour_interval contour_base n_levels
+      levels_ptr (if use_no_data then 1 else 0) no_data
+      layer id elevation null null
+
+  let rasterize_geometries arg =
+    Lib.c "GDALRasterizeGeometries" (
+      Data_set.t @-> int @-> ptr int @->
+      int @-> ptr Ogr.Geometry.t @->
+      Foreign.funptr (Transform.transform_t (ptr void)) @-> ptr void @->
+      ptr double @->
+      ptr string_opt @->
+      ptr void @-> ptr void @-> returning err
+    )
+
+  let rasterize_geometries dataset bands geometries transform burn options =
+    let n_bands, bands =
+      let a = CArray.of_list int bands in
+      CArray.length a, a
+    in
+    let n_geoms, geoms =
+      let a = CArray.of_list Ogr.Geometry.t geometries in
+      CArray.length a, a
+    in
+    let burn = CArray.of_list double burn in
+    let transform_t = Transform.get_transform_t transform in
+    let transform_c = Transform.get_transform_c transform in
+    rasterize_geometries transform_t
+      dataset n_bands (CArray.start bands)
+      n_geoms (CArray.start geoms)
+      transform_c transform_t
+      (CArray.start burn) (Lib.convert_creation_options options)
+      null null
 end
