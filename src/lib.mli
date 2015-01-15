@@ -4,10 +4,9 @@ val init_dynamic : ?lib:string -> unit -> unit
 
     @param lib defaults to ["libgdal.so"] *)
 
-val all_register : unit -> unit
 val register_all : unit -> unit
-(** [register_all ()] will register all GDAL data sources.  This should be run
-    before using most IO can be performed.
+(** [register_all ()] will register all GDAL and OGR data sources.  This should
+    be run before using most IO can be performed.
 
     {!all_register} is an alias to match the GDAL C API spelling. *)
 
@@ -32,6 +31,10 @@ val set_config_option : string -> string option -> unit
 val get_config_option : ?default:string -> string -> string option
 (** [get_config_option ?default key] returns the value associated with [key].
     If no value is associated with [key] then [default] is returned. *)
+
+val get_last_error_message : unit -> string
+(** [get_last_error_message ()] returns a string representation of the last
+    error to occur. *)
 
 (**/**)
 val c : string -> ('a -> 'b) Ctypes.fn -> 'a -> 'b

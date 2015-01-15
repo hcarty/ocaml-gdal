@@ -15,7 +15,15 @@ let all_register =
   c "GDALAllRegister"
     (void @-> returning void)
 
-let register_all = all_register
+let gdal_register_all = all_register
+
+let ogr_register_all =
+  c "OGRRegisterAll"
+    (void @-> returning void)
+
+let register_all () =
+  gdal_register_all ();
+  ogr_register_all ()
 
 let protect f x ~finally =
   let res = try f x with e -> finally x; raise e in
@@ -66,3 +74,7 @@ let get_config_option =
 
 let get_config_option ?default key =
   get_config_option key default
+
+let get_last_error_message =
+  c "CPLGetLastErrorMsg"
+    (void @-> returning string)

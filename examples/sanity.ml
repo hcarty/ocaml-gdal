@@ -12,30 +12,30 @@ let parse_args () =
 
 let () =
   let shapefile = parse_args () in
-  Ogr.Lib.init_dynamic ();
-  Ogr.Lib.register_all ();
+  Gdal.Lib.init_dynamic ();
+  Gdal.Lib.register_all ();
   let result =
-  Ogr.Data_source.with_source shapefile (
+  Gdal.Data_source.with_source shapefile (
     fun ds ->
       p 1;
-      let layer = Ogr.Data_source.get_layer ds 0 in
+      let layer = Gdal.Data_source.get_layer ds 0 in
       p 2;
-      Ogr.Layer.reset_reading layer;
+      Gdal.Layer.reset_reading layer;
       p 3;
-      Ogr.Layer.iter_features layer (
+      Gdal.Layer.iter_features layer (
         fun feature ->
           p 4;
-          let feature_defn = Ogr.Layer.get_layer_defn layer in
+          let feature_defn = Gdal.Layer.get_layer_defn layer in
           p 5;
-          let count = Ogr.Feature.Defn.get_field_count feature_defn in
+          let count = Gdal.Feature.Defn.get_field_count feature_defn in
           if count > 0 then begin
             p 6;
-            let field_defn = Ogr.Feature.Defn.get_field_defn feature_defn 0 in
+            let field_defn = Gdal.Feature.Defn.get_field_defn feature_defn 0 in
             p 7;
-            let _field_type = Ogr.Field.Defn.get_type field_defn in
+            let _field_type = Gdal.Field.Defn.get_type field_defn in
             p 8;
             for i = 0 to count - 1 do
-              print_endline @@ Ogr.Feature.get_as_string feature i;
+              print_endline @@ Gdal.Feature.get_as_string feature i;
             done;
             p 9;
           end;

@@ -1,8 +1,9 @@
 # OASIS_START
-# DO NOT EDIT (digest: ef8d3d986d976579b30df4af500aea3e)
+# DO NOT EDIT (digest: d5a4c8297a1b21b71829b8817d1cf562)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
+true: annot, bin_annot
 <**/.svn>: -traverse
 <**/.svn>: not_hygienic
 ".bzr": -traverse
@@ -13,42 +14,35 @@
 ".git": not_hygienic
 "_darcs": -traverse
 "_darcs": not_hygienic
-# Library ogr
-"src/ogr/ogr.cmxs": use_ogr
-"src/ogr/data_source.cmx": for-pack(Ogr)
-"src/ogr/driver.cmx": for-pack(Ogr)
-"src/ogr/feature.cmx": for-pack(Ogr)
-"src/ogr/field.cmx": for-pack(Ogr)
-"src/ogr/geometry.cmx": for-pack(Ogr)
-"src/ogr/layer.cmx": for-pack(Ogr)
-"src/ogr/lib.cmx": for-pack(Ogr)
-"src/ogr/spatial_reference.cmx": for-pack(Ogr)
-"src/ogr/t.cmx": for-pack(Ogr)
-<src/ogr/*.ml{,i}>: pkg_ctypes.foreign
 # Library gdal
-"src/gdal/gdal.cmxs": use_gdal
-"src/gdal/alg.cmx": for-pack(Gdal)
-"src/gdal/band.cmx": for-pack(Gdal)
-"src/gdal/data_set.cmx": for-pack(Gdal)
-"src/gdal/driver.cmx": for-pack(Gdal)
-"src/gdal/geo_transform.cmx": for-pack(Gdal)
-"src/gdal/lib.cmx": for-pack(Gdal)
-"src/gdal/transform.cmx": for-pack(Gdal)
-"src/gdal/vsi.cmx": for-pack(Gdal)
-"src/gdal/warp.cmx": for-pack(Gdal)
-"src/gdal/t.cmx": for-pack(Gdal)
-<src/gdal/*.ml{,i}>: pkg_bigarray
-<src/gdal/*.ml{,i}>: pkg_ctypes.foreign
+"src/gdal.cmxs": use_gdal
+"src/alg.cmx": for-pack(Gdal)
+"src/band.cmx": for-pack(Gdal)
+"src/data_set.cmx": for-pack(Gdal)
+"src/data_source.cmx": for-pack(Gdal)
+"src/driver.cmx": for-pack(Gdal)
+"src/feature.cmx": for-pack(Gdal)
+"src/field.cmx": for-pack(Gdal)
+"src/geometry.cmx": for-pack(Gdal)
+"src/geo_transform.cmx": for-pack(Gdal)
+"src/layer.cmx": for-pack(Gdal)
+"src/lib.cmx": for-pack(Gdal)
+"src/spatial_reference.cmx": for-pack(Gdal)
+"src/transform.cmx": for-pack(Gdal)
+"src/vsi.cmx": for-pack(Gdal)
+"src/warp.cmx": for-pack(Gdal)
+"src/t.cmx": for-pack(Gdal)
+<src/*.ml{,i,y}>: pkg_bigarray
+<src/*.ml{,i,y}>: pkg_ctypes.foreign
 # Executable sanity
+<examples/sanity.{native,byte}>: pkg_bigarray
 <examples/sanity.{native,byte}>: pkg_ctypes.foreign
-<examples/sanity.{native,byte}>: use_ogr
+<examples/sanity.{native,byte}>: use_gdal
 # Executable warptut
 <examples/warptut.{native,byte}>: pkg_bigarray
 <examples/warptut.{native,byte}>: pkg_ctypes.foreign
 <examples/warptut.{native,byte}>: use_gdal
-<examples/warptut.{native,byte}>: use_ogr
-<examples/*.ml{,i}>: pkg_bigarray
-<examples/*.ml{,i}>: pkg_ctypes.foreign
-<examples/*.ml{,i}>: use_gdal
-<examples/*.ml{,i}>: use_ogr
+<examples/*.ml{,i,y}>: pkg_bigarray
+<examples/*.ml{,i,y}>: pkg_ctypes.foreign
+<examples/*.ml{,i,y}>: use_gdal
 # OASIS_STOP

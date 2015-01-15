@@ -1,7 +1,7 @@
 OASISFormat: 0.4
 Name:        gdal
-Version:     0.7.0
-Synopsis:    Bindings to the GDAL and OGR libraries
+Version:     0.8.0
+Synopsis:    Bindings to the GDAL libraries
 Authors:     Hezekiah M. Carty <hez@0ok.org>
 Maintainers: Hezekiah M. Carty <hez@0ok.org>
 Homepage:    https://github.com/hcarty/ocaml-gdal
@@ -10,31 +10,23 @@ Plugins:     META (0.4), DevFiles (0.4)
 
 BuildTools:  ocamlbuild
 
-Library ogr
-  Path:            src/ogr
-  BuildDepends:    ctypes.foreign (>= 0.3)
-  Pack:            true
-  Modules:         Data_source,
-                   Driver,
-                   Feature,
-                   Field,
-                   Geometry,
-                   Layer,
-                   Lib,
-                   Spatial_reference
-  InternalModules: T
-
 Library gdal
-  Path:            src/gdal
+  Path:            src/
   BuildDepends:    ctypes.foreign (>= 0.3),
                    bigarray
   Pack:            true
   Modules:         Alg,
                    Band,
                    Data_set,
+                   Data_source,
                    Driver,
+                   Feature,
+                   Field,
+                   Geometry,
                    Geo_transform,
+                   Layer,
                    Lib,
+                   Spatial_reference,
                    Transform,
                    Vsi,
                    Warp
@@ -48,7 +40,7 @@ Executable sanity
   Path:           examples
   MainIs:         sanity.ml
   Build$:         flag(examples)
-  BuildDepends:   ogr
+  BuildDepends:   gdal
   Install:        false
   CompiledObject: best
 
@@ -56,7 +48,7 @@ Executable warptut
   Path:           examples
   MainIs:         warptut.ml
   Build$:         flag(examples)
-  BuildDepends:   ogr, gdal
+  BuildDepends:   gdal
   Install:        false
   CompiledObject: best
 

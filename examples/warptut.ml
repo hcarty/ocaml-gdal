@@ -1,8 +1,6 @@
 let init () =
   Gdal.Lib.init_dynamic ();
   Gdal.Lib.register_all ();
-  Ogr.Lib.init_dynamic ();
-  Ogr.Lib.register_all ();
   ()
 
 let usage_and_exit () =
@@ -42,8 +40,8 @@ let () =
   let driver = Gdal.Driver.get_by_name_exn "GTiff" in
 
   (* Output coordinate system will be WGS84 *)
-  let dst_sr = Ogr.Spatial_reference.make `name "WGS84" in
-  let dst_wkt = Ogr.Spatial_reference.to_wkt dst_sr in
+  let dst_sr = Gdal.Spatial_reference.make `name "WGS84" in
+  let dst_wkt = Gdal.Spatial_reference.to_wkt dst_sr in
 
   (* Create a transformer that maps from source pixel/line coordinates to
      destination georeferenced coordinates (not destination pixel/line).  We do
