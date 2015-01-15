@@ -13,6 +13,45 @@ val fill_nodata :
     [target]'s missing data pixels.  See GDAL's [GDALFillNoData] documentation
     for an explanation of the function parameters. *)
 
+val generate_contours :
+  ?no_data:float ->
+  ?id:int ->
+  ?elevation:int ->
+  ('v, 'e) Band.t ->
+  Layer.t ->
+  [ `fixed of float list | `interval of float * float ] ->
+  unit
+(** [generate_contours ?no_data ?id ?elevation band layer contours] will
+    create contours from [band], adding them to [layer].
+
+    @param no_data will be used as the "no data" value if specified.
+    @param id specifies a field where an identifier for each contour written
+    to [layer].
+    @param elevation specifies a field where the elevation value for each
+    contour is written.
+    @param band is the field to generate contours from.
+    @param layer is the layer where contour geometries will be written to.
+    @param contours specifies the contours to create.  [`fixed l] will create
+    contours for each value in [l].  [`interval (start, step)] will create
+    intervals starting with [start] and [step] intervals past that. *)
+
+val rasterize_geometries :
+  Data_set.t -> int list ->
+  Geometry.t list -> 'a Transform.t ->
+  float list ->
+  string list -> unit
+(** [rasterize_geometries ds bands geometries transform burn options] will
+    will rasterize [geometries] onto [ds].
+
+    @param ds is the data set where output is written.
+    @param bands specifies the list of bands to update.
+    @param geometries is the list of geometries to burn in.
+    @param transform specifies the transformation to pixel/line coordinates.
+    @param burn specifies the values to burn into the raster.  There should
+    be one value per band per geometry.
+    @param options specifies rasterization options.  See the documentation
+    for [GDALRasterizeGeometries] for available options. *)
+
 module Grid : sig
   type interpolate_t
 
