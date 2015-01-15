@@ -36,21 +36,25 @@ val generate_contours :
     intervals starting with [start] and [step] intervals past that. *)
 
 val rasterize_geometries :
+  ?transform:'a Transform.t ->
+  ?options:string list ->
   Data_set.t -> int list ->
-  Geometry.t list -> 'a Transform.t ->
-  float list ->
-  string list -> unit
-(** [rasterize_geometries ds bands geometries transform burn options] will
+  (Geometry.t * float list) list ->
+  unit
+(** [rasterize_geometries ?transform ?options ds bands geometries burn] will
     will rasterize [geometries] onto [ds].
 
     @param ds is the data set where output is written.
     @param bands specifies the list of bands to update.
-    @param geometries is the list of geometries to burn in.
+    @param geometries is the list of geometries to burn in and the values to
+    burn, one per entry in [bands].
     @param transform specifies the transformation to pixel/line coordinates.
-    @param burn specifies the values to burn into the raster.  There should
-    be one value per band per geometry.
+    Not required if [ds] and [geometries] use the same coordinates.
     @param options specifies rasterization options.  See the documentation
-    for [GDALRasterizeGeometries] for available options. *)
+    for [GDALRasterizeGeometries] for available options.  Defaults to [[]].
+
+    @raise Invalid_argument if the length of the burn value list(s) do not
+    match the length of the band list. *)
 
 module Grid : sig
   type interpolate_t

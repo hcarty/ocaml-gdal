@@ -57,24 +57,39 @@ let rasterize_geometries arg =
   Lib.c "GDALRasterizeGeometries" (
     Data_set.t @-> int @-> ptr int @->
     int @-> ptr Geometry.t @->
-    Foreign.funptr (Transform.transform_t (ptr void)) @-> ptr void @->
+    Foreign.funptr_opt (Transform.transform_t (ptr void)) @-> ptr void @->
     ptr double @->
     ptr string_opt @->
     ptr void @-> ptr void @-> returning err
   )
 
-let rasterize_geometries dataset bands geometries transform burn options =
+let split_list l =
+  let rec loop l one two =
+    match l with
+    | [] -> List.rev one, List.rev two
+    | (o, t) :: tl -> loop l (o :: one) (t :: two)
+  in
+  loop l [] []
+
+let rasterize_geometries ?transform ?(options = []) dataset bands geometries =
   let n_bands, bands =
     let a = CArray.of_list int bands in
     CArray.length a, a
+  in
+  let geometries, burn =
+    let g, bs = split_list geometries in
+    g, List.concat bs
   in
   let n_geoms, geoms =
     let a = CArray.of_list Geometry.t geometries in
     CArray.length a, a
   in
   let burn = CArray.of_list double burn in
-  let transform_t = Transform.get_transform_t transform in
-  let transform_c = Transform.get_transform_c transform in
+  let transform_t, transform_c =
+    match transform with
+    | Some t -> Transform.get_transform_t t, Some (Transform.get_transform_c t)
+    | None -> null, None
+  in
   rasterize_geometries transform_t
     dataset n_bands (CArray.start bands)
     n_geoms (CArray.start geoms)
