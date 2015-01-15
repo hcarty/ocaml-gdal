@@ -1,5 +1,4 @@
 PKG ctypes.foreign
-S src/ogr/
-S src/gdal/
-B _build/src/ogr/
-B _build/src/gdal/
+S src/
+B _build/src/
+B _build/src/
