@@ -39,5 +39,8 @@ val get_last_error_message : unit -> string
 (**/**)
 val c : string -> ('a -> 'b) Ctypes.fn -> 'a -> 'b
 val protect : ('a -> 'b) -> 'a -> finally:('a -> unit) -> 'b
-val convert_creation_options : string list -> string option Ctypes.ptr
+val convert_creation_options :
+  string list -> string option Ctypes.CArray.t option
+val creation_options_to_ptr :
+  string option Ctypes.CArray.t option -> string option Ctypes.ptr
 (** Internal support functions *)

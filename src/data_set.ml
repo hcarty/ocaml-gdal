@@ -87,7 +87,8 @@ let add_band =
 
 let add_band ?(options = []) t kind =
   let i = Band.Data.to_int kind in
-  add_band t i (Lib.convert_creation_options options)
+  let options = Lib.convert_creation_options options in
+  add_band t i (Lib.creation_options_to_ptr options)
 
 let create_copy =
   Lib.c "GDALCreateCopy" (
@@ -104,7 +105,7 @@ let create_copy ?(strict = false) ?(options = []) src driver name =
   let dst =
     create_copy driver name src
       (if strict then 1 else 0)
-      options null null
+      (Lib.creation_options_to_ptr options) null null
   in
   if dst = null then
     `Error `Invalid_source
@@ -131,7 +132,8 @@ let create ?(options = []) ?bands driver name (columns, rows) =
   let options = Lib.convert_creation_options options in
   let ds =
     create
-      driver name columns rows nbands (Band.Data.to_int_opt kind) options
+      driver name columns rows nbands (Band.Data.to_int_opt kind)
+      (Lib.creation_options_to_ptr options)
   in
   if ds = null then
     `Error `Invalid_source
@@ -148,7 +150,8 @@ let copy =
     (t @-> t @-> ptr string_opt @-> ptr void @-> ptr void @-> returning copy_err)
 
 let copy ?(options = []) ~src ~dst =
-  copy src dst (Lib.convert_creation_options options) null null
+  let options = Lib.convert_creation_options options in
+  copy src dst (Lib.creation_options_to_ptr options) null null
 
 let set_projection =
   Lib.c "GDALSetProjection"

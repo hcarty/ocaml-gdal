@@ -32,8 +32,8 @@ module Options = struct
     let src_ds = f "src_ds" Data_set.t
     let dst_ds = f "dst_ds" Data_set.t
     let band_count = f "band_count" int
-    let src_bands = f "src_bands" (ptr int)
-    let dst_bands = f "dst_bands" (ptr int)
+    let src_bands = f "src_bands" (ptr nativeint)
+    let dst_bands = f "dst_bands" (ptr nativeint)
     let src_alpha_band = f "src_alpha_band" int
     let dst_alpha_band = f "dst_alpha_band" int
     let src_no_data_real = f "src_no_data_real" (ptr_opt double)
@@ -84,6 +84,15 @@ module Options = struct
     let clone =
       Lib.c "GDALCloneWarpOptions"
         (ptr t @-> returning (ptr t))
+
+    let delete =
+      Lib.c "CPLFree"
+        (ptr t @-> returning void)
+
+    let create () =
+      let o = create () in
+      Gc.finalise delete o;
+      o
   end
 
   exception Band_count_mismatch
@@ -92,22 +101,31 @@ module Options = struct
      it's safe *)
   type 'a t = {
     o : Raw.t;
-    mutable warp_options : string option ptr option;
-    mutable src_ds : Data_set.t option;
-    mutable dst_ds : Data_set.t option;
-    mutable src_bands : int carray option;
-    mutable dst_bands : int carray option;
-    mutable src_no_data_real : float carray option;
-    mutable src_no_data_imag : float carray option;
-    mutable dst_no_data_real : float carray option;
-    mutable dst_no_data_imag : float carray option;
-    mutable transform : 'a Transform.t option;
+    mutable options : string option Ctypes.CArray.t option;
+    mutable src_bands :
+      (nativeint, Bigarray.nativeint_elt,
+       Bigarray.c_layout) Bigarray.Array1.t option;
+    mutable dst_bands :
+      (nativeint, Bigarray.nativeint_elt,
+       Bigarray.c_layout) Bigarray.Array1.t option;
+    mutable src_no_data_real :
+      (float, Bigarray.float64_elt,
+       Bigarray.c_layout) Bigarray.Array1.t option;
+    mutable src_no_data_imag :
+      (float, Bigarray.float64_elt,
+       Bigarray.c_layout) Bigarray.Array1.t option;
+    mutable dst_no_data_real :
+      (float, Bigarray.float64_elt,
+       Bigarray.c_layout) Bigarray.Array1.t option;
+    mutable dst_no_data_imag :
+      (float, Bigarray.float64_elt,
+       Bigarray.c_layout) Bigarray.Array1.t option;
   }
 
   let set_warp_options o options =
     let options = Lib.convert_creation_options options in
-    setf !@(o.o) Raw.warp_options options;
-    o.warp_options <- Some options;
+    setf !@(o.o) Raw.warp_options (Lib.creation_options_to_ptr options);
+    o.options <- options;
     ()
 
   let set_memory_limit { o; _ } l =
@@ -124,32 +142,42 @@ module Options = struct
     setf !@o Raw.data_type i;
     ()
 
-  let set_src o ds =
-    setf !@(o.o) Raw.src_ds ds;
-    o.src_ds <- Some ds;
+  let set_src { o; _ } ds =
+    setf !@o Raw.src_ds ds;
     ()
 
-  let set_dst o ds =
-    setf !@(o.o) Raw.dst_ds ds;
-    o.dst_ds <- Some ds;
+  let set_dst { o; _ } ds =
+    setf !@o Raw.dst_ds ds;
     ()
 
   let set_bands o bands =
-    let src = List.map fst bands in
-    let dst = List.map snd bands in
-    let src = CArray.of_list int src in
-    let dst = CArray.of_list int dst in
-    let n = CArray.length src in
+    let src =
+      List.map (fun (s, _) -> Nativeint.of_int s) bands
+      |> Array.of_list
+    in
+    let dst =
+      List.map (fun (_, d) -> Nativeint.of_int d) bands
+      |> Array.of_list
+    in
+    let open Bigarray in
+    let src = Array1.of_array nativeint c_layout src in
+    let dst = Array1.of_array nativeint c_layout dst in
+    let n = Array1.dim src in
     setf !@(o.o) Raw.band_count n;
-    setf !@(o.o) Raw.src_bands (CArray.start src);
-    setf !@(o.o) Raw.dst_bands (CArray.start dst);
+    setf !@(o.o) Raw.src_bands (bigarray_start array1 src);
+    setf !@(o.o) Raw.dst_bands (bigarray_start array1 dst);
     o.src_bands <- Some src;
     o.dst_bands <- Some dst;
     ()
 
   let ptr_opt_of_list typ = function
     | [] -> None
-    | l -> Some (CArray.of_list typ l)
+    | l ->
+      let a =
+        Array.of_list l
+        |> Bigarray.(Array1.of_array float64 c_layout)
+      in
+      Some a
 
   let set_band_dep o l f =
     let bands = getf !@(o.o) Raw.band_count in
@@ -160,7 +188,7 @@ module Options = struct
       setf !@(o.o) f None;
       None
     | Some ca ->
-      let p = CArray.start ca in
+      let p = bigarray_start array1 ca in
       setf !@(o.o) f (Some p);
       Some ca
 
@@ -180,12 +208,12 @@ module Options = struct
     let ca = set_band_dep o l Raw.dst_no_data_imag in
     o.dst_no_data_imag <- ca
 
-  let set_transformer o transform =
+  let set_transformer { o; _ } transform =
     let c = Transform.get_transform_c transform in
     let arg = Transform.get_transform_t transform in
-    setf !@(o.o) Raw.transformer c;
-    setf !@(o.o) Raw.transformer_arg arg;
-    o.transform <- Some transform
+    setf !@o Raw.transformer c;
+    setf !@o Raw.transformer_arg arg;
+    ()
 
   let may f o =
     match o with
@@ -196,16 +224,13 @@ module Options = struct
     let o = Raw.create () in
     {
       o;
-      warp_options = None;
-      src_ds = None;
-      dst_ds = None;
+      options = None;
       src_bands = None;
       dst_bands = None;
       src_no_data_real = None;
       src_no_data_imag = None;
       dst_no_data_real = None;
       dst_no_data_imag = None;
-      transform = None;
     }
 
   let make ?warp_options ?memory_limit ?resample_alg ?working_data_type
@@ -269,7 +294,8 @@ let create_and_reproject_image
     | Some { Options.o; _ } -> o
   in
   let create_options = Lib.convert_creation_options create_options in
-  create_and_reproject_image src src_wkt filename dst_wkt driver create_options
+  create_and_reproject_image src src_wkt filename dst_wkt driver
+    (Lib.creation_options_to_ptr create_options)
     (int_of_resample alg) memory_limit max_error null null options
 
 let auto_create_warped_vrt =
@@ -348,8 +374,8 @@ module Operation = struct
     Lib.c "GDALChunkAndWarpImage"
       (t @-> int @-> int @-> int @-> int @-> returning err)
 
-  let chunk_and_warp_image { t; _ } ~offset ~size =
-    chunk_and_warp_image t (fst offset) (snd offset) (fst size) (snd size)
+  let chunk_and_warp_image t ~offset ~size =
+    chunk_and_warp_image t.t (fst offset) (snd offset) (fst size) (snd size)
 
   let chunk_and_warp_multi =
     Lib.c "GDALChunkAndWarpMulti"

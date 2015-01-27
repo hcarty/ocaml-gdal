@@ -216,7 +216,8 @@ let copy =
     (t @-> t @-> ptr string_opt @-> ptr void @-> ptr void @-> returning err)
 
 let copy ?(options = []) ~src:(s, _) ~dst:(d, _) =
-  copy s d (Lib.convert_creation_options options) null null
+  let options = Lib.convert_creation_options options in
+  copy s d (Lib.creation_options_to_ptr options) null null
 
 module Block = struct
   exception Wrong_dimensions

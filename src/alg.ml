@@ -10,7 +10,7 @@ let proximity =
 
 let proximity ?(options = []) ~src:(sc, _) ~test:(tc, _) =
   let options = Lib.convert_creation_options options in
-  proximity sc tc options null null
+  proximity sc tc (Lib.creation_options_to_ptr options) null null
 
 let fill_nodata =
   Lib.c "GDALFillNoData" (
@@ -22,8 +22,9 @@ let fill_nodata =
   )
 
 let fill_nodata ?(options = []) ~target:(tc, _) ~mask:(mc, _) search_distance smoothing_iterations =
+  let options = Lib.convert_creation_options options in
   fill_nodata tc mc search_distance 0 smoothing_iterations
-    (Lib.convert_creation_options options) null null
+    (Lib.creation_options_to_ptr options) null null
 
 let generate_contours =
   Lib.c "GDALContourGenerate" (
@@ -90,11 +91,12 @@ let rasterize_geometries ?transform ?(options = []) dataset bands geometries =
     | Some t -> Transform.get_transform_t t, Some (Transform.get_transform_c t)
     | None -> null, None
   in
+  let options = Lib.convert_creation_options options in
   rasterize_geometries transform_t
     dataset n_bands (CArray.start bands)
     n_geoms (CArray.start geoms)
     transform_c transform_t
-    (CArray.start burn) (Lib.convert_creation_options options)
+    (CArray.start burn) (Lib.creation_options_to_ptr options)
     null null
 
 module Grid = struct

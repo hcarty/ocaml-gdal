@@ -36,7 +36,7 @@ let identify =
 
 let identify ?(options = []) name =
   let options = Lib.convert_creation_options options in
-  let driver = identify name options in
+  let driver = identify name (Lib.creation_options_to_ptr options) in
   if driver = null then
     None
   else

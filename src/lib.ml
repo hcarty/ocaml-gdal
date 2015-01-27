@@ -33,7 +33,7 @@ let protect f x ~finally =
 (* Safely convert string lists (NULL for empty lists) *)
 let convert_creation_options options =
   match options with
-  | [] -> from_voidp string_opt null
+  | [] -> None
   | _ ->
     (* We need a null pointer at the end of the array *)
     let n = List.length options + 1 in
@@ -43,7 +43,15 @@ let convert_creation_options options =
         CArray.set ca i (Some o)
     ) options;
     CArray.set ca (n - 1) None;
-    CArray.start ca
+    Some ca
+
+let creation_options_to_ptr = function
+  | None -> from_voidp string_opt null
+  | Some ca -> CArray.start ca
+
+let convert_creation_options_to_ptr options =
+  convert_creation_options options
+  |> creation_options_to_ptr
 
 let set_cache_max =
   c "GDALSetCacheMax64"
