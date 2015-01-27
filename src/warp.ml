@@ -32,8 +32,8 @@ module Options = struct
     let src_ds = f "src_ds" Data_set.t
     let dst_ds = f "dst_ds" Data_set.t
     let band_count = f "band_count" int
-    let src_bands = f "src_bands" (ptr nativeint)
-    let dst_bands = f "dst_bands" (ptr nativeint)
+    let src_bands = f "src_bands" (ptr int)
+    let dst_bands = f "dst_bands" (ptr int)
     let src_alpha_band = f "src_alpha_band" int
     let dst_alpha_band = f "dst_alpha_band" int
     let src_no_data_real = f "src_no_data_real" (ptr_opt double)
@@ -103,23 +103,17 @@ module Options = struct
     o : Raw.t;
     mutable options : string option Ctypes.CArray.t option;
     mutable src_bands :
-      (nativeint, Bigarray.nativeint_elt,
-       Bigarray.c_layout) Bigarray.Array1.t option;
+      (int, Bigarray.int_elt, Bigarray.c_layout) Bigarray.Array1.t option;
     mutable dst_bands :
-      (nativeint, Bigarray.nativeint_elt,
-       Bigarray.c_layout) Bigarray.Array1.t option;
+      (int, Bigarray.int_elt, Bigarray.c_layout) Bigarray.Array1.t option;
     mutable src_no_data_real :
-      (float, Bigarray.float64_elt,
-       Bigarray.c_layout) Bigarray.Array1.t option;
+      (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t option;
     mutable src_no_data_imag :
-      (float, Bigarray.float64_elt,
-       Bigarray.c_layout) Bigarray.Array1.t option;
+      (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t option;
     mutable dst_no_data_real :
-      (float, Bigarray.float64_elt,
-       Bigarray.c_layout) Bigarray.Array1.t option;
+      (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t option;
     mutable dst_no_data_imag :
-      (float, Bigarray.float64_elt,
-       Bigarray.c_layout) Bigarray.Array1.t option;
+      (float, Bigarray.float64_elt, Bigarray.c_layout) Bigarray.Array1.t option;
   }
 
   let set_warp_options o options =
@@ -151,17 +145,11 @@ module Options = struct
     ()
 
   let set_bands o bands =
-    let src =
-      List.map (fun (s, _) -> Nativeint.of_int s) bands
-      |> Array.of_list
-    in
-    let dst =
-      List.map (fun (_, d) -> Nativeint.of_int d) bands
-      |> Array.of_list
-    in
+    let src = List.map fst bands |> Array.of_list in
+    let dst = List.map snd bands |> Array.of_list in
     let open Bigarray in
-    let src = Array1.of_array nativeint c_layout src in
-    let dst = Array1.of_array nativeint c_layout dst in
+    let src = Array1.of_array int c_layout src in
+    let dst = Array1.of_array int c_layout dst in
     let n = Array1.dim src in
     setf !@(o.o) Raw.band_count n;
     setf !@(o.o) Raw.src_bands (bigarray_start array1 src);
