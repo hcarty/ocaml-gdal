@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: d5a4c8297a1b21b71829b8817d1cf562)
+# DO NOT EDIT (digest: 3ac90271593c227858bdecc3b4648456)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -42,6 +42,10 @@ true: annot, bin_annot
 <examples/warptut.{native,byte}>: pkg_bigarray
 <examples/warptut.{native,byte}>: pkg_ctypes.foreign
 <examples/warptut.{native,byte}>: use_gdal
+# Executable warptut1
+<examples/warptut1.{native,byte}>: pkg_bigarray
+<examples/warptut1.{native,byte}>: pkg_ctypes.foreign
+<examples/warptut1.{native,byte}>: use_gdal
 <examples/*.ml{,i,y}>: pkg_bigarray
 <examples/*.ml{,i,y}>: pkg_ctypes.foreign
 <examples/*.ml{,i,y}>: use_gdal
