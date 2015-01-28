@@ -86,7 +86,7 @@ module Options = struct
         (ptr t @-> returning (ptr t))
 
     let delete =
-      Lib.c "CPLFree"
+      Lib.c "free"
         (ptr t @-> returning void)
 
     let create () =
