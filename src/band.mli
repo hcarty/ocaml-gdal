@@ -104,11 +104,37 @@ val iter_read : ('v, _) t -> (int -> int -> 'v -> unit) -> unit
     the band and the [v]alue at this offset. *)
 
 val iter_write : ('v, _) t -> (int -> int -> 'v) -> unit
-(** [iter_read t f] calls [f] with every pixel offset in [t].  The result of
+(** [iter_write t f] calls [f] with every pixel offset in [t].  The result of
     [f] is written back to [t] at the current offset.
 
     @param f gets three arguments: [column], [row] for the pixel offset within the
-    band and the [v]alue at this offset. *)
+    band. *)
+
+val itera :
+  ('v1, _) t array -> ('v2, _) t ->
+  (int -> int -> 'v1 array -> 'v2 -> 'v2) ->
+  unit
+(** [itera src dst f] acts like {!iter} except that it applies [f] to matching
+    pixels in each raster in [src] and [dst], writing the result of [f] back to
+    [dst].  All bands in [src] and [dst] must have the same overall dimensions
+    and the same block size.
+
+    @param f gets three arguments: [column], [row] and the [src] value and
+    [dst] values at this location in the bands. *)
+
+val itera_read :
+  ('v1, _) t array -> ('v2, _) t ->
+  (int -> int -> 'v1 array -> 'v2 -> unit) ->
+  unit
+(** [itera_read src dst f] is like {!itera} except that no values are written
+    back to [dst]. *)
+
+val itera_write :
+  ('v1, _) t array -> ('v2, _) t ->
+  (int -> int -> 'v1 array -> 'v2) ->
+  unit
+(** [itera_write t f] is like {!itera} except that no values are read from
+    [dst]. *)
 
 val fold : ('v, _) t -> (int -> int -> 'v -> 'accu -> 'accu) -> 'accu -> 'accu
 (** [fold t f init] folds over the pixels in [t] with [f]. *)

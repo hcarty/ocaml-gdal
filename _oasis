@@ -60,6 +60,14 @@ Executable warptut1
   Install:        false
   CompiledObject: best
 
+Executable band_iter
+  Path:           examples
+  MainIs:         band_iter.ml
+  Build$:         flag(examples)
+  BuildDepends:   gdal
+  Install:        false
+  CompiledObject: best
+
 SourceRepository master
   Type:     git
   Location: https://github.com/hcarty/ocaml-gdal.git

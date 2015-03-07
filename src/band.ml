@@ -381,6 +381,82 @@ let iter t f =
       ()
   )
 
+let itera src dst f =
+  let block_cols, block_rows = Block.get_size dst in
+  Block.iter dst ~read:true ~write:true (
+    fun block_col block_row dst_data ->
+      let src_data =
+        Array.map (
+          fun t ->
+            Block.read t ~column:block_col ~row:block_row
+        ) src
+      in
+      let open Bigarray in
+      let pixel_rows = Array2.dim1 dst_data in
+      let pixel_cols = Array2.dim2 dst_data in
+      for pixel_row = 0 to pixel_rows - 1 do
+        for pixel_col = 0 to pixel_cols - 1 do
+          let col = block_col * block_cols + pixel_col in
+          let row = block_row * block_rows + pixel_row in
+          let dst_v = dst_data.{pixel_row, pixel_col} in
+          let src_v = Array.map (fun a -> a.{pixel_row, pixel_col}) src_data in
+          let result = f col row src_v dst_v in
+          dst_data.{pixel_row, pixel_col} <- result;
+        done;
+      done;
+      ()
+  )
+
+let itera_read src dst f =
+  let block_cols, block_rows = Block.get_size dst in
+  Block.iter dst ~read:true ~write:false (
+    fun block_col block_row dst_data ->
+      let src_data =
+        Array.map (
+          fun t ->
+            Block.read t ~column:block_col ~row:block_row
+        ) src
+      in
+      let open Bigarray in
+      let pixel_rows = Array2.dim1 dst_data in
+      let pixel_cols = Array2.dim2 dst_data in
+      for pixel_row = 0 to pixel_rows - 1 do
+        for pixel_col = 0 to pixel_cols - 1 do
+          let col = block_col * block_cols + pixel_col in
+          let row = block_row * block_rows + pixel_row in
+          let dst_v = dst_data.{pixel_row, pixel_col} in
+          let src_v = Array.map (fun a -> a.{pixel_row, pixel_col}) src_data in
+          f col row src_v dst_v;
+        done;
+      done;
+      ()
+  )
+
+let itera_write src dst f =
+  let block_cols, block_rows = Block.get_size dst in
+  Block.iter dst ~read:false ~write:true (
+    fun block_col block_row dst_data ->
+      let src_data =
+        Array.map (
+          fun t ->
+            Block.read t ~column:block_col ~row:block_row
+        ) src
+      in
+      let open Bigarray in
+      let pixel_rows = Array2.dim1 dst_data in
+      let pixel_cols = Array2.dim2 dst_data in
+      for pixel_row = 0 to pixel_rows - 1 do
+        for pixel_col = 0 to pixel_cols - 1 do
+          let col = block_col * block_cols + pixel_col in
+          let row = block_row * block_rows + pixel_row in
+          let src_v = Array.map (fun a -> a.{pixel_row, pixel_col}) src_data in
+          let result = f col row src_v in
+          dst_data.{pixel_row, pixel_col} <- result;
+        done;
+      done;
+      ()
+  )
+
 let iter_read t f =
   let block_cols, block_rows = Block.get_size t in
   Block.iter t ~read:true ~write:false (
