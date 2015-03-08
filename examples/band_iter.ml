@@ -23,7 +23,7 @@ let () =
   (* Iterate over three bands, or at least one band three times *)
   Band.itera_read [|band; band|] band (
     fun col row src dst ->
-      let sum = dst + Array.fold_left ( + ) 0 src in
+      let sum = Array.fold_left ( + ) dst src in
       minv3x := min !minv3x sum;
       maxv3x := max !maxv3x sum;
   );
