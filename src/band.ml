@@ -285,7 +285,8 @@ module Block = struct
         else
           raise Wrong_dimensions
     in
-    read c column row (bigarray_start array2 ba |> to_voidp);
+    let ba_ptr = bigarray_start array2 ba in
+    read c column row (to_voidp ba_ptr);
     ba
 
   let write =
