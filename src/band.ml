@@ -382,7 +382,20 @@ let iter t f =
       ()
   )
 
+(* [check src dst] returns [true] if the dimensions and block dimensions of
+   each band in [src] matches those in [dst]. *)
+let check src dst =
+  let block_size = Block.get_size dst in
+  let band_size = get_size dst in
+  Array.fold_right (
+    fun band ok ->
+      ok &&
+      Block.get_size band = block_size &&
+      get_size band = band_size
+  ) src true
+
 let itera src dst f =
+  if not (check src dst) then invalid_arg "Band.itera";
   let block_cols, block_rows = Block.get_size dst in
   Block.iter dst ~read:true ~write:true (
     fun block_col block_row dst_data ->
@@ -409,6 +422,7 @@ let itera src dst f =
   )
 
 let itera_read src dst f =
+  if not (check src dst) then invalid_arg "Band.itera_read";
   let block_cols, block_rows = Block.get_size dst in
   Block.iter dst ~read:true ~write:false (
     fun block_col block_row dst_data ->
@@ -434,6 +448,7 @@ let itera_read src dst f =
   )
 
 let itera_write src dst f =
+  if not (check src dst) then invalid_arg "Band.itera_write";
   let block_cols, block_rows = Block.get_size dst in
   Block.iter dst ~read:false ~write:true (
     fun block_col block_row dst_data ->
