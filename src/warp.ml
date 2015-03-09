@@ -412,9 +412,10 @@ module Operation = struct
         let kind = Band.Data.to_ba_kind dt in
         Array2.create kind c_layout (doy + dsy) (dox + dsx)
     in
-    let buffer_ptr = bigarray_start array2 buffer |> to_voidp in
+    let buffer_ptr = bigarray_start array2 buffer in
     let dt_i = Band.Data.to_int dt in
-    warp_region_to_buffer t dox doy dsx dsy buffer_ptr dt_i sox soy ssx ssy;
+    warp_region_to_buffer t dox doy dsx dsy (to_voidp buffer_ptr) dt_i
+      sox soy ssx ssy;
     buffer
 
   let wrap ?offset ?size options f =

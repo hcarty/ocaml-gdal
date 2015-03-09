@@ -26,9 +26,9 @@ let close =
     (t @-> returning err)
 
 let of_buffer filename buffer =
-  let buffer_ptr = bigarray_start array1 buffer |> to_voidp in
+  let buffer_ptr = bigarray_start array1 buffer in
   let buffer_length = Bigarray.Array1.dim buffer in
-  match from_mem_buffer filename buffer_ptr buffer_length 0 with
+  match from_mem_buffer filename (to_voidp buffer_ptr) buffer_length 0 with
   | None -> raise VSI_error
   | Some vsf ->
     (* Keep a reference to the underlying buffer *)

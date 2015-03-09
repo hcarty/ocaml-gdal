@@ -92,17 +92,21 @@ let rasterize_geometries ?transform ?(options = []) dataset bands geometries =
     | None -> null, None
   in
   let options = Lib.convert_creation_options options in
+  let bands_ptr = CArray.start bands in
+  let geoms_ptr = CArray.start geoms in
+  let burn_ptr = CArray.start burn in
+  let options_ptr = Lib.creation_options_to_ptr options in
   rasterize_geometries transform_t
-    dataset n_bands (CArray.start bands)
-    n_geoms (CArray.start geoms)
+    dataset n_bands bands_ptr
+    n_geoms geoms_ptr
     transform_c transform_t
-    (CArray.start burn) (Lib.creation_options_to_ptr options)
+    burn_ptr options_ptr
     null null
 
 module Grid = struct
   type interpolate_t = {
     algorithm : int;
-    options : unit ptr;
+    options : (interpolate_t, [ `Struct ]) structured;
   }
 
   let inverse_distance_to_a_power
@@ -139,7 +143,7 @@ module Grid = struct
     setf o nMaxPoints (Unsigned.UInt32.of_int (snd points));
     setf o nMinPoints (Unsigned.UInt32.of_int (fst points));
     setf o dfNoDataValue no_data_value;
-    { algorithm = 1; options = to_voidp (addr o) }
+    { algorithm = 1; options = o }
 
   let moving_average
       ~radius
@@ -161,7 +165,7 @@ module Grid = struct
     setf o dfAngle angle;
     setf o nMinPoints (Unsigned.UInt32.of_int min_points);
     setf o dfNoDataValue no_data_value;
-    { algorithm = 2; options = to_voidp (addr o) }
+    { algorithm = 2; options = o }
 
   let nearest_neighbor
       ~radius
@@ -180,7 +184,7 @@ module Grid = struct
     setf o dfRadius2 (snd radius);
     setf o dfAngle angle;
     setf o dfNoDataValue no_data_value;
-    { algorithm = 3; options = to_voidp (addr o) }
+    { algorithm = 3; options = o }
 
   type metric_t =
     radius:float * float ->
@@ -209,7 +213,7 @@ module Grid = struct
     setf o dfAngle angle;
     setf o nMinPoints (Unsigned.UInt32.of_int min_points);
     setf o dfNoDataValue no_data_value;
-    { algorithm; options = to_voidp (addr o) }
+    { algorithm; options = o }
 
   let metric_minimum = metric 4
   let metric_maximum = metric 5
@@ -230,10 +234,6 @@ module Grid = struct
       returning err
     )
 
-  let of_list l =
-    CArray.of_list double l
-    |> CArray.start
-
   let make
       interpolation points
       ~xrange:(nx, xmin, xmax)
@@ -248,13 +248,21 @@ module Grid = struct
       let open Bigarray in
       Array2.create (Band.Data.to_ba_kind data_type) c_layout nx ny
     in
+    let xs = CArray.of_list double xs in
+    let ys = CArray.of_list double ys in
+    let zs = CArray.of_list double zs in
+    let xs_ptr = CArray.start xs in
+    let ys_ptr = CArray.start ys in
+    let zs_ptr = CArray.start zs in
+    let ba_ptr = bigarray_start array2 ba in
+    let options_ptr = addr interpolation.options in
     grid_create
-      interpolation.algorithm interpolation.options
-      (Unsigned.UInt32.of_int npts) (of_list xs) (of_list ys) (of_list zs)
+      interpolation.algorithm (to_voidp options_ptr)
+      (Unsigned.UInt32.of_int npts) xs_ptr ys_ptr zs_ptr
       xmin xmax ymin ymax
       (Unsigned.UInt32.of_int nx) (Unsigned.UInt32.of_int ny)
       (Band.Data.to_int data_type)
-      (bigarray_start array2 ba |> to_voidp)
+      (to_voidp ba_ptr)
       null null;
     ba
 end

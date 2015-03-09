@@ -152,6 +152,7 @@ let io
       Array2.create (Data.to_ba_kind kind) c_layout buffer_rows buffer_cols
     | Some buffer -> buffer
   in
+  let ba_ptr = bigarray_start array2 ba in
   io
     c
     (match write with None -> 0 | Some _ -> 1)
@@ -159,7 +160,7 @@ let io
     (snd offset)
     (fst size)
     (snd size)
-    (bigarray_start array2 ba |> to_voidp)
+    (to_voidp ba_ptr)
     buffer_cols
     buffer_rows
     (Data.to_int kind)
@@ -294,7 +295,8 @@ module Block = struct
       (t @-> int @-> int @-> ptr void @-> returning err)
 
   let write (t, _) ~column ~row data =
-    write t column row (bigarray_start array2 data |> to_voidp)
+    let data_ptr = bigarray_start array2 data in
+    write t column row (to_voidp data_ptr)
 
   let read' = read
   let write' = write
