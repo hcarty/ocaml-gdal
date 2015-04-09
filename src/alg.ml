@@ -54,6 +54,14 @@ let generate_contours ?no_data ?id ?elevation band layer contours =
     levels_ptr (if use_no_data then 1 else 0) no_data
     layer id elevation null null
 
+let split_list l =
+  let rec loop l one two =
+    match l with
+    | [] -> List.rev one, List.rev two
+    | (o, t) :: tl -> loop l (o :: one) (t :: two)
+  in
+  loop l [] []
+
 let rasterize_geometries =
   Lib.c "GDALRasterizeGeometries" (
     Data_set.t @-> int @-> ptr int @->
@@ -63,14 +71,6 @@ let rasterize_geometries =
     ptr string_opt @->
     ptr void @-> ptr void @-> returning err
   )
-
-let split_list l =
-  let rec loop l one two =
-    match l with
-    | [] -> List.rev one, List.rev two
-    | (o, t) :: tl -> loop l (o :: one) (t :: two)
-  in
-  loop l [] []
 
 let rasterize_geometries ?transform ?(options = []) dataset bands geometries =
   let n_bands, bands =
@@ -99,6 +99,47 @@ let rasterize_geometries ?transform ?(options = []) dataset bands geometries =
   rasterize_geometries
     dataset n_bands bands_ptr
     n_geoms geoms_ptr
+    transform_c transform_t
+    burn_ptr options_ptr
+    null null
+
+let rasterize_layers =
+  Lib.c "GDALRasterizeLayers" (
+    Data_set.t @-> int @-> ptr int @->
+    int @-> ptr Layer.t @->
+    Foreign.funptr_opt (Transform.transform_t (ptr void)) @-> ptr void @->
+    ptr double @->
+    ptr string_opt @->
+    ptr void @-> ptr void @-> returning err
+  )
+
+let rasterize_layers ?transform ?(options = []) dataset bands layers =
+  let n_bands, bands =
+    let a = CArray.of_list int bands in
+    CArray.length a, a
+  in
+  let layers, burn =
+    let g, bs = split_list layers in
+    g, List.concat bs
+  in
+  let n_lyrs, lyrs =
+    let a = CArray.of_list Layer.t layers in
+    CArray.length a, a
+  in
+  let burn = CArray.of_list double burn in
+  let transform_t, transform_c =
+    match transform with
+    | Some t -> Transform.get_transform_t t, Some (Transform.get_transform_c t)
+    | None -> null, None
+  in
+  let options = Lib.convert_creation_options options in
+  let bands_ptr = CArray.start bands in
+  let lyrs_ptr = CArray.start lyrs in
+  let burn_ptr = CArray.start burn in
+  let options_ptr = Lib.creation_options_to_ptr options in
+  rasterize_layers
+    dataset n_bands bands_ptr
+    n_lyrs lyrs_ptr
     transform_c transform_t
     burn_ptr options_ptr
     null null

@@ -56,6 +56,27 @@ val rasterize_geometries :
     @raise Invalid_argument if the length of the burn value list(s) do not
     match the length of the band list. *)
 
+val rasterize_layers :
+  ?transform:'a Transform.t ->
+  ?options:string list ->
+  Data_set.t -> int list ->
+  (Layer.t * float list) list ->
+  unit
+(** [rasterize_layers ?transform ?options ds bands layers burn] will
+    will rasterize [layers] onto [ds].
+
+    @param ds is the data set where output is written.
+    @param bands specifies the list of bands to update.
+    @param layers is the list of layers to burn in and the values to
+    burn, one per entry in [bands].
+    @param transform specifies the transformation to pixel/line coordinates.
+    Not required if [ds] and [layers] use the same coordinates.
+    @param options specifies rasterization options.  See the documentation
+    for [GDALRasterizeLayers] for available options.  Defaults to [[]].
+
+    @raise Invalid_argument if the length of the burn value list(s) do not
+    match the length of the band list. *)
+
 module Grid : sig
   type interpolate_t
 
