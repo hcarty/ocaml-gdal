@@ -49,3 +49,6 @@ val get_type : t -> wkb_t
 val get_x : t -> int -> float
 val get_y : t -> int -> float
 (** [get_* t i] returns the position of the [i]th point in the geometry [t]. *)
+
+val clone : t -> t
+(** [clone t] returns a copy of [t]. *)

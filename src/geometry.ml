@@ -86,3 +86,7 @@ let get_x =
 let get_y =
   Lib.c "OGR_G_GetY"
     (t @-> int @-> returning float)
+
+let clone =
+  Lib.c "OGR_G_Clone"
+    (t @-> returning t)
