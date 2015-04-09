@@ -54,7 +54,7 @@ let generate_contours ?no_data ?id ?elevation band layer contours =
     levels_ptr (if use_no_data then 1 else 0) no_data
     layer id elevation null null
 
-let rasterize_geometries arg =
+let rasterize_geometries =
   Lib.c "GDALRasterizeGeometries" (
     Data_set.t @-> int @-> ptr int @->
     int @-> ptr Geometry.t @->
@@ -96,7 +96,7 @@ let rasterize_geometries ?transform ?(options = []) dataset bands geometries =
   let geoms_ptr = CArray.start geoms in
   let burn_ptr = CArray.start burn in
   let options_ptr = Lib.creation_options_to_ptr options in
-  rasterize_geometries transform_t
+  rasterize_geometries
     dataset n_bands bands_ptr
     n_geoms geoms_ptr
     transform_c transform_t
