@@ -34,6 +34,10 @@ let get_geometry_ref =
   Lib.c "OGR_F_GetGeometryRef"
     (t @-> returning Geometry.t)
 
+let get_geometry_copy t =
+  let g = get_geometry_ref t in
+  Geometry.clone g
+
 let destroy =
   Lib.c "OGR_F_Destroy"
     (t @-> returning void)

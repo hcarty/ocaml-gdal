@@ -16,6 +16,10 @@ val get_as_string : t -> int -> string
 val get_geometry_ref : t -> Geometry.t
 (** [get_geometry_ref t] returns the geometry associated with [t]. *)
 
+val get_geometry_copy : t -> Geometry.t
+(** [get_geometry_copy t] returns a copy of the geometry associated with [t].
+    It is equivalent to calling [get_geometry_ref t |> Geometry.clone]. *)
+
 val destroy : t -> unit
 (** [destroy t] frees the feature [t]. *)
 
