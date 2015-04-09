@@ -58,7 +58,7 @@ let split_list l =
   let rec loop l one two =
     match l with
     | [] -> List.rev one, List.rev two
-    | (o, t) :: tl -> loop l (o :: one) (t :: two)
+    | (o, t) :: tl -> loop tl (o :: one) (t :: two)
   in
   loop l [] []
 
