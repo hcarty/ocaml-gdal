@@ -14,7 +14,9 @@ val get_as_string : t -> int -> string
 (** [get_as_* t i] returns field [i] from feature [t]. *)
 
 val get_geometry_ref : t -> Geometry.t
-(** [get_geometry_ref t] returns the geometry associated with [t]. *)
+(** [get_geometry_ref t] returns the geometry associated with [t].
+    You must keep [t] around for the life of the returned {!Geometry.t}.  Use
+    {!get_geometry_copy} to avoid this requirement. *)
 
 val get_geometry_copy : t -> Geometry.t
 (** [get_geometry_copy t] returns a copy of the geometry associated with [t].

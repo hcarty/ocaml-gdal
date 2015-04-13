@@ -40,9 +40,6 @@ val int_of_wkb : wkb_t -> int
 type t
 (** An OGR geometry *)
 
-val t : t Ctypes.typ
-(** Values for proper Ctypes integration/extension *)
-
 val get_type : t -> wkb_t
 (** [get_type t] returns the type of the given geometry [t]. *)
 
@@ -52,3 +49,8 @@ val get_y : t -> int -> float
 
 val clone : t -> t
 (** [clone t] returns a copy of [t]. *)
+
+(**/**)
+
+val t : t Ctypes.typ
+(** Values for proper Ctypes integration/extension *)
