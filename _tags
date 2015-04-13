@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: a4f1a3e8434c9bde4338d2557494b2a1)
+# DO NOT EDIT (digest: ec4497af0da47465a28e4a74d0016d03)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -50,6 +50,10 @@ true: annot, bin_annot
 <examples/band_iter.{native,byte}>: pkg_bigarray
 <examples/band_iter.{native,byte}>: pkg_ctypes.foreign
 <examples/band_iter.{native,byte}>: use_gdal
+# Executable alg_test
+<examples/alg_test.{native,byte}>: pkg_bigarray
+<examples/alg_test.{native,byte}>: pkg_ctypes.foreign
+<examples/alg_test.{native,byte}>: use_gdal
 <examples/*.ml{,i,y}>: pkg_bigarray
 <examples/*.ml{,i,y}>: pkg_ctypes.foreign
 <examples/*.ml{,i,y}>: use_gdal

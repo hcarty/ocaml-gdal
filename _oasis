@@ -68,6 +68,14 @@ Executable band_iter
   Install:        false
   CompiledObject: best
 
+Executable alg_test
+  Path:           examples
+  MainIs:         alg_test.ml
+  Build$:         flag(examples)
+  BuildDepends:   gdal
+  Install:        false
+  CompiledObject: best
+
 SourceRepository master
   Type:     git
   Location: https://github.com/hcarty/ocaml-gdal.git
