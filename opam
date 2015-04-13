@@ -1,0 +1,45 @@
+opam-version: "1.2"
+
+name: "gdal"
+version: "dev"
+maintainer: "hez@0ok.org"
+author: "Hezekiah M. Carty"
+license: "MIT"
+homepage: "https://github.com/hcarty/ocaml-gdal"
+bug-reports: "https://github.com/hcarty/ocaml-gdal/issues"
+dev-repo: "https://github.com/hcarty/ocaml-gdal.git"
+
+build: [
+  ["ocaml" "setup.ml" "-configure" "--prefix" prefix]
+  ["ocaml" "setup.ml" "-build"]
+]
+install: [
+  ["ocaml" "setup.ml" "-install"]
+]
+#build-doc: ["ocaml" "setup.ml" "-doc"]
+#build-test: [
+#  ["ocaml" "setup.ml" "-configure" "--enable-tests"]
+#  ["ocaml" "setup.ml" "-build"]
+#  ["ocaml" "setup.ml" "-test"]
+#]
+
+remove: [["ocamlfind" "remove" "gdal"]]
+
+depends: [
+  "ocamlfind" {build}
+  "ctypes"
+  "ctypes-foreign"
+]
+
+ocaml-version: [>= "4.01.0"]
+
+depexts: [
+  [
+    ["debian"]
+    ["libgdal-dev"]
+  ]
+  [
+    ["ubuntu"]
+    ["libgdal-dev"]
+  ]
+]
