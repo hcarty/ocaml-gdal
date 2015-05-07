@@ -27,8 +27,8 @@ remove: [["ocamlfind" "remove" "gdal"]]
 
 depends: [
   "ocamlfind" {build}
-  "ctypes"
-  "ctypes-foreign"
+  "ctypes" {>= "0.4.0"}
+  "ctypes-foreign" {>= "0.4.0"}
 ]
 
 ocaml-version: [>= "4.01.0"]
