@@ -3,13 +3,13 @@ open Foreign
 
 type t = T.t
 let t = T.t
+let t_opt = T.t_opt
 
 exception Layer_error
 
 let err = T.err Layer_error
 
 (* Raw bindings *)
-
 let get_name =
   Lib.c "OGR_L_GetName"
     (t @-> returning string)

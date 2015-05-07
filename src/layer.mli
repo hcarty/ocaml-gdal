@@ -5,6 +5,7 @@
 type t
 
 val t : t Ctypes.typ
+val t_opt : t option Ctypes.typ
 
 exception Layer_error
 
