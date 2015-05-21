@@ -76,6 +76,14 @@ Executable alg_test
   Install:        false
   CompiledObject: best
 
+Executable contour
+  Path:           examples
+  MainIs:         contour.ml
+  Build$:         flag(examples)
+  BuildDepends:   gdal
+  Install:        false
+  CompiledObject: best
+
 SourceRepository master
   Type:     git
   Location: https://github.com/hcarty/ocaml-gdal.git
