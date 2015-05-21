@@ -369,20 +369,20 @@ module Operation = struct
     Lib.c "GDALChunkAndWarpMulti"
       (t @-> int @-> int @-> int @-> int @-> returning err)
 
-  let chunk_and_warp_multi { t; _ } ~offset ~size =
-    chunk_and_warp_multi t (fst offset) (snd offset) (fst size) (snd size)
+  let chunk_and_warp_multi t ~offset ~size =
+    chunk_and_warp_multi t.t (fst offset) (snd offset) (fst size) (snd size)
 
   let warp_region =
     Lib.c "GDALWarpRegion"
       (t @-> int @-> int @-> int @-> int @-> int @-> int @-> int @-> int @->
        returning err)
 
-  let warp_region { t; _ } ~dst_offset ~dst_size ~src_offset ~src_size =
+  let warp_region t ~dst_offset ~dst_size ~src_offset ~src_size =
     let dox, doy = dst_offset in
     let dsx, dsy = dst_size in
     let sox, soy = src_offset in
     let ssx, ssy = src_size in
-    warp_region t dox doy dsx dsy sox soy ssx ssy
+    warp_region t.t dox doy dsx dsy sox soy ssx ssy
 
   let warp_region_to_buffer =
     Lib.c "GDALWarpRegionToBuffer"
@@ -392,7 +392,7 @@ module Operation = struct
        returning err)
 
   let warp_region_to_buffer
-      ?buffer { t; _ } dt ~dst_offset ~dst_size ~src_offset ~src_size
+      ?buffer t dt ~dst_offset ~dst_size ~src_offset ~src_size
     =
     let open Bigarray in
     let dox, doy = dst_offset in
@@ -414,7 +414,7 @@ module Operation = struct
     in
     let buffer_ptr = bigarray_start array2 buffer in
     let dt_i = Band.Data.to_int dt in
-    warp_region_to_buffer t dox doy dsx dsy (to_voidp buffer_ptr) dt_i
+    warp_region_to_buffer t.t dox doy dsx dsy (to_voidp buffer_ptr) dt_i
       sox soy ssx ssy;
     buffer
 
