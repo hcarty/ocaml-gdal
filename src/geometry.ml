@@ -71,6 +71,10 @@ let wkb_of_int = function
 type t = T.t
 let t = T.t
 
+let get_name =
+  Lib.c "OGR_G_GetGeometryName"
+    (t @-> returning string)
+
 let get_type =
   Lib.c "OGR_G_GetGeometryType"
     (t @-> returning int)
@@ -79,12 +83,20 @@ let get_type t =
   get_type t
   |> wkb_of_int
 
+let get_point_count =
+  Lib.c "OGR_G_GetPointCount"
+    (t @-> returning int)
+
 let get_x =
   Lib.c "OGR_G_GetX"
     (t @-> int @-> returning float)
 
 let get_y =
   Lib.c "OGR_G_GetY"
+    (t @-> int @-> returning float)
+
+let get_z =
+  Lib.c "OGR_G_GetZ"
     (t @-> int @-> returning float)
 
 let clone =

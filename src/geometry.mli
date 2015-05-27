@@ -40,11 +40,18 @@ val int_of_wkb : wkb_t -> int
 type t
 (** An OGR geometry *)
 
+val get_name : t -> string
+(** [get_name t] returns the WKT name for the geometry [t]. *)
+
 val get_type : t -> wkb_t
 (** [get_type t] returns the type of the given geometry [t]. *)
 
+val get_point_count : t -> int
+(** [get_point_count t] returns the number of points in [t]. *)
+
 val get_x : t -> int -> float
 val get_y : t -> int -> float
+val get_z : t -> int -> float
 (** [get_* t i] returns the position of the [i]th point in the geometry [t]. *)
 
 val clone : t -> t
