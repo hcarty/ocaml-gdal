@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: e51c889a2ca89ea9dbe1bd61a3a479dc)
+# DO NOT EDIT (digest: b90b7785c1ed28edc27c4454a4c75f0c)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -32,33 +32,33 @@ true: annot, bin_annot
 "src/vsi.cmx": for-pack(Gdal)
 "src/warp.cmx": for-pack(Gdal)
 "src/t.cmx": for-pack(Gdal)
-<src/*.ml{,i,y}>: pkg_bigarray
-<src/*.ml{,i,y}>: pkg_ctypes.foreign
+<src/*.ml{,i,y}>: package(bigarray)
+<src/*.ml{,i,y}>: package(ctypes.foreign)
 # Executable sanity
-<examples/sanity.{native,byte}>: pkg_bigarray
-<examples/sanity.{native,byte}>: pkg_ctypes.foreign
+<examples/sanity.{native,byte}>: package(bigarray)
+<examples/sanity.{native,byte}>: package(ctypes.foreign)
 <examples/sanity.{native,byte}>: use_gdal
 # Executable warptut
-<examples/warptut.{native,byte}>: pkg_bigarray
-<examples/warptut.{native,byte}>: pkg_ctypes.foreign
+<examples/warptut.{native,byte}>: package(bigarray)
+<examples/warptut.{native,byte}>: package(ctypes.foreign)
 <examples/warptut.{native,byte}>: use_gdal
 # Executable warptut1
-<examples/warptut1.{native,byte}>: pkg_bigarray
-<examples/warptut1.{native,byte}>: pkg_ctypes.foreign
+<examples/warptut1.{native,byte}>: package(bigarray)
+<examples/warptut1.{native,byte}>: package(ctypes.foreign)
 <examples/warptut1.{native,byte}>: use_gdal
 # Executable band_iter
-<examples/band_iter.{native,byte}>: pkg_bigarray
-<examples/band_iter.{native,byte}>: pkg_ctypes.foreign
+<examples/band_iter.{native,byte}>: package(bigarray)
+<examples/band_iter.{native,byte}>: package(ctypes.foreign)
 <examples/band_iter.{native,byte}>: use_gdal
 # Executable alg_test
-<examples/alg_test.{native,byte}>: pkg_bigarray
-<examples/alg_test.{native,byte}>: pkg_ctypes.foreign
+<examples/alg_test.{native,byte}>: package(bigarray)
+<examples/alg_test.{native,byte}>: package(ctypes.foreign)
 <examples/alg_test.{native,byte}>: use_gdal
 # Executable contour
-<examples/contour.{native,byte}>: pkg_bigarray
-<examples/contour.{native,byte}>: pkg_ctypes.foreign
+<examples/contour.{native,byte}>: package(bigarray)
+<examples/contour.{native,byte}>: package(ctypes.foreign)
 <examples/contour.{native,byte}>: use_gdal
-<examples/*.ml{,i,y}>: pkg_bigarray
-<examples/*.ml{,i,y}>: pkg_ctypes.foreign
+<examples/*.ml{,i,y}>: package(bigarray)
+<examples/*.ml{,i,y}>: package(ctypes.foreign)
 <examples/*.ml{,i,y}>: use_gdal
 # OASIS_STOP

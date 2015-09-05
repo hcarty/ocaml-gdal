@@ -7,6 +7,7 @@ Maintainers: Hezekiah M. Carty <hez@0ok.org>
 Homepage:    https://github.com/hcarty/ocaml-gdal
 License:     MIT
 Plugins:     META (0.4), DevFiles (0.4)
+OCamlVersion: >= 4.02.1
 
 BuildTools:  ocamlbuild
 
