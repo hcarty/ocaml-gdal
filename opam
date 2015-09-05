@@ -13,9 +13,7 @@ build: [
   ["ocaml" "setup.ml" "-configure" "--prefix" prefix]
   ["ocaml" "setup.ml" "-build"]
 ]
-install: [
-  ["ocaml" "setup.ml" "-install"]
-]
+install: ["ocaml" "setup.ml" "-install"]
 #build-doc: ["ocaml" "setup.ml" "-doc"]
 #build-test: [
 #  ["ocaml" "setup.ml" "-configure" "--enable-tests"]
@@ -23,7 +21,7 @@ install: [
 #  ["ocaml" "setup.ml" "-test"]
 #]
 
-remove: [["ocamlfind" "remove" "gdal"]]
+remove: ["ocamlfind" "remove" "gdal"]
 
 depends: [
   "ocamlfind" {build}
@@ -31,7 +29,7 @@ depends: [
   "ctypes-foreign" {>= "0.4.0"}
 ]
 
-ocaml-version: [>= "4.01.0"]
+available: [ ocaml-version >= "4.02.1"]
 
 depexts: [
   [
