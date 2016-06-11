@@ -107,7 +107,7 @@ let copy_exn ?options driver src name =
 
 let create_layer =
   Lib.c "OGR_DS_CreateLayer"
-    (t @-> string @-> Spatial_reference.t_opt @-> int @->
+    (t @-> string @-> Spatial_reference.t_opt @-> nativeint @->
      ptr string_opt @-> returning Layer.t_opt)
 
 let create_layer
@@ -115,7 +115,7 @@ let create_layer
     ds name =
   let options = Lib.convert_creation_options options in
   create_layer ds name spatial_reference
-    (Geometry.int_of_wkb geometry_type)
+    (Geometry.nativeint_of_wkb geometry_type)
     (Lib.creation_options_to_ptr options)
 
 let create_layer_exn ?spatial_reference ?geometry_type ?options ds name =

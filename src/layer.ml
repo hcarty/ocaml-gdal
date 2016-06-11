@@ -16,11 +16,11 @@ let get_name =
 
 let get_geom_type =
   Lib.c "OGR_L_GetGeomType"
-    (t @-> returning int)
+    (t @-> returning nativeint)
 
 let get_geom_type t =
   get_geom_type t
-  |> Geometry.wkb_of_int
+  |> Geometry.wkb_of_nativeint
 
 let get_spatial_filter =
   Lib.c "OGR_L_GetSpatialFilter"
