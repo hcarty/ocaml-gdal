@@ -29,43 +29,43 @@ type wkb_t =
   | MultiPolygon25D
   | GeometryCollection25D
 
-let int_of_wkb = function
-  | Unknown -> 0
-  | Point -> 1       
-  | LineString -> 2
-  | Polygon -> 3
-  | MultiPoint -> 4
-  | MultiLineString -> 5
-  | MultiPolygon -> 6
-  | GeometryCollection -> 7
-  | None -> 100
-  | LinearRing -> 101
-  | Point25D -> 0x80000001
-  | LineString25D -> 0x80000002
-  | Polygon25D -> 0x80000003
-  | MultiPoint25D -> 0x80000004
-  | MultiLineString25D -> 0x80000005
-  | MultiPolygon25D -> 0x80000006
-  | GeometryCollection25D -> 0x80000007
+let nativeint_of_wkb = function
+  | Unknown -> 0n
+  | Point -> 1n
+  | LineString -> 2n
+  | Polygon -> 3n
+  | MultiPoint -> 4n
+  | MultiLineString -> 5n
+  | MultiPolygon -> 6n
+  | GeometryCollection -> 7n
+  | None -> 100n
+  | LinearRing -> 101n
+  | Point25D -> 0x80000001n
+  | LineString25D -> 0x80000002n
+  | Polygon25D -> 0x80000003n
+  | MultiPoint25D -> 0x80000004n
+  | MultiLineString25D -> 0x80000005n
+  | MultiPolygon25D -> 0x80000006n
+  | GeometryCollection25D -> 0x80000007n
 
-let wkb_of_int = function
-  | 0 -> Unknown
-  | 1 -> Point
-  | 2 -> LineString
-  | 3 -> Polygon
-  | 4 -> MultiPoint
-  | 5 -> MultiLineString
-  | 6 -> MultiPolygon
-  | 7 -> GeometryCollection
-  | 100 -> None
-  | 101 -> LinearRing
-  | 0x80000001 -> Point25D
-  | 0x80000002 -> LineString25D 
-  | 0x80000003 -> Polygon25D 
-  | 0x80000004 -> MultiPoint25D
-  | 0x80000005 -> MultiLineString25D
-  | 0x80000006 -> MultiPolygon25D
-  | 0x80000007 -> GeometryCollection25D
+let wkb_of_nativeint = function
+  | 0n -> Unknown
+  | 1n -> Point
+  | 2n -> LineString
+  | 3n -> Polygon
+  | 4n -> MultiPoint
+  | 5n -> MultiLineString
+  | 6n -> MultiPolygon
+  | 7n -> GeometryCollection
+  | 100n -> None
+  | 101n -> LinearRing
+  | 0x80000001n -> Point25D
+  | 0x80000002n -> LineString25D
+  | 0x80000003n -> Polygon25D
+  | 0x80000004n -> MultiPoint25D
+  | 0x80000005n -> MultiLineString25D
+  | 0x80000006n -> MultiPolygon25D
+  | 0x80000007n -> GeometryCollection25D
   | _ -> raise Geometry_error
 
 type t = T.t
@@ -77,11 +77,11 @@ let get_name =
 
 let get_type =
   Lib.c "OGR_G_GetGeometryType"
-    (t @-> returning int)
+    (t @-> returning nativeint)
 
 let get_type t =
   get_type t
-  |> wkb_of_int
+  |> wkb_of_nativeint
 
 let get_point_count =
   Lib.c "OGR_G_GetPointCount"

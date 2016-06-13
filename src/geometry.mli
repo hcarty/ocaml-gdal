@@ -33,8 +33,8 @@ type wkb_t =
   | GeometryCollection25D
 (** Geometry types *)
 
-val wkb_of_int : int -> wkb_t
-val int_of_wkb : wkb_t -> int
+val wkb_of_nativeint : nativeint -> wkb_t
+val nativeint_of_wkb : wkb_t -> nativeint
 (** Conversion between {!wkb_t} and the C API's integer values *)
 
 type t
