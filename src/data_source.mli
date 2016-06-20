@@ -104,7 +104,5 @@ val t : t Ctypes.typ
 
 (** These should not be necessary under normal circumstances. *)
 
-exception Data_source_error
-
 val release : t -> unit
 (** @raise Data_source_error *)
