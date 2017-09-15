@@ -58,6 +58,9 @@ val get_layer_by_name : t -> string -> Layer.t
 val get_layer : t -> int -> Layer.t
 (** [get_layer* src id] returns a {!Layer.t} extracted from [src]. *)
 
+val get_layer_count : t -> int
+(** [get_layer_count src] returns the number of layers in [src]. *)
+
 val create_layer :
   ?spatial_reference:Spatial_reference.t ->
   ?geometry_type:Geometry.wkb_t ->
