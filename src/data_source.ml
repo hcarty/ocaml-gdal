@@ -29,6 +29,10 @@ let get_layer =
   Lib.c "OGR_DS_GetLayer"
     (t @-> int @-> returning Layer.t)
 
+let get_layer_count =
+    Lib.c "OGR_DS_GetLayerCount"
+    (t @-> returning int)
+
 let of_source ?(write = false) name =
   let h = open_ name (if write then 1 else 0) None in
   if h = null then
