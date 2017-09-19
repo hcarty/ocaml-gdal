@@ -89,15 +89,15 @@ let get_point_count =
 
 let get_x =
   Lib.c "OGR_G_GetX"
-    (t @-> int @-> returning float)
+    (t @-> int @-> returning double)
 
 let get_y =
   Lib.c "OGR_G_GetY"
-    (t @-> int @-> returning float)
+    (t @-> int @-> returning double
 
 let get_z =
   Lib.c "OGR_G_GetZ"
-    (t @-> int @-> returning float)
+    (t @-> int @-> returning double)
 
 let clone =
   Lib.c "OGR_G_Clone"

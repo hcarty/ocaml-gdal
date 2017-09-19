@@ -29,4 +29,8 @@ module Defn : sig
   val get_type : t -> field_type_t
   (** [get_type t] returns the data type associated with the field
       definition [t]. *)
+
+  val get_name : t -> string
+  (** [get_name t] returns the name associated with the field
+      definition [t]. *)
 end
