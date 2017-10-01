@@ -93,7 +93,7 @@ let get_x =
 
 let get_y =
   Lib.c "OGR_G_GetY"
-    (t @-> int @-> returning double
+    (t @-> int @-> returning double)
 
 let get_z =
   Lib.c "OGR_G_GetZ"
