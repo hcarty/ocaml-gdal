@@ -56,6 +56,6 @@ module Defn = struct
     |> field_type_of_int
 
   let get_name =
-    Lib.c "OGR_GetNameRef"
+    Lib.c "OGR_Fld_GetNameRef"
       (t @-> returning string)
 end
