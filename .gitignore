@@ -1,4 +1,3 @@
 _build/
-*.native
-setup.log
-setup.data
+.merlin
+*.install

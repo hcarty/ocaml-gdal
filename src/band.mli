@@ -4,6 +4,9 @@ type c
 type ('v, 'e) t = c * ('v, 'e) Bigarray.kind
 val t : c Ctypes.typ
 
+val to_ba_kind : ('v, 'e) t -> ('v, 'e) Bigarray.kind
+(** [to_ba_kind t] returns the {!Bigarray.kind} matching [t]. *)
+
 module Data : sig
   type ('v, 'e) t =
     | Byte : (int, Bigarray.int8_unsigned_elt) t

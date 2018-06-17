@@ -1,6 +1,5 @@
 open Ctypes
 
-type t = T.t
 let t = T.t
 let t_opt = T.t_opt
 
@@ -8,10 +7,10 @@ exception VSI_error
 
 let err = T.err VSI_error
 
-type buffer_t =
-  (int, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
+type bigstring =
+  (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
 
-let memory_buffers : (string, buffer_t) Hashtbl.t = Hashtbl.create 1
+let memory_buffers : (string, bigstring) Hashtbl.t = Hashtbl.create 1
 
 let from_mem_buffer =
   Lib.c "VSIFileFromMemBuffer"

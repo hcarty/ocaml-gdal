@@ -34,47 +34,47 @@ module Options = struct
     let band_count = f "band_count" int
     let src_bands = f "src_bands" (ptr int)
     let dst_bands = f "dst_bands" (ptr int)
-    let src_alpha_band = f "src_alpha_band" int
-    let dst_alpha_band = f "dst_alpha_band" int
+    let _src_alpha_band = f "src_alpha_band" int
+    let _dst_alpha_band = f "dst_alpha_band" int
     let src_no_data_real = f "src_no_data_real" (ptr_opt double)
     let src_no_data_imag = f "src_no_data_imag" (ptr_opt double)
     let dst_no_data_real = f "dst_no_data_real" (ptr_opt double)
     let dst_no_data_imag = f "dst_no_data_imag" (ptr_opt double)
-    let progress = f "progress" (ptr void)
-    let progress_arg = f "progress_arg" (ptr void)
+    let _progress = f "progress" (ptr void)
+    let _progress_arg = f "progress_arg" (ptr void)
     let transformer =
       f "transformer" (Foreign.funptr (Transform.transform_t (ptr void)))
     let transformer_arg = f "transformer_arg" (ptr void)
-    let src_per_band_validity_mask_func =
+    let _src_per_band_validity_mask_func =
       f "src_per_band_validity_mask_func" (ptr void)
-    let src_per_band_validity_mask_func_arg =
+    let _src_per_band_validity_mask_func_arg =
       f "src_per_band_validity_mask_func_arg" (ptr (ptr void))
-    let src_validity_mask_func =
+    let _src_validity_mask_func =
       f "src_validity_mask_func" (ptr void)
-    let src_validity_mask_func_arg =
+    let _src_validity_mask_func_arg =
       f "src_validity_mask_func_arg" (ptr void)
-    let src_density_mask_func =
+    let _src_density_mask_func =
       f "src_density_mask_func" (ptr void)
-    let src_density_mask_func_arg =
+    let _src_density_mask_func_arg =
       f "src_density_mask_func_arg" (ptr void)
-    let dst_density_mask_func =
+    let _dst_density_mask_func =
       f "dst_density_mask_func" (ptr void)
-    let dst_density_mask_func_arg =
+    let _dst_density_mask_func_arg =
       f "dst_density_mask_func_arg" (ptr void)
-    let dst_validity_mask_func =
+    let _dst_validity_mask_func =
       f "dst_validity_mask_func" (ptr void)
-    let dst_validity_mask_func_arg =
+    let _dst_validity_mask_func_arg =
       f "dst_validity_mask_func_arg" (ptr void)
-    let pre_warp_chunk_processor =
+    let _pre_warp_chunk_processor =
       f "pre_warp_chunk_processor" (ptr void)
-    let pre_warp_chunk_processor_arg =
+    let _pre_warp_chunk_processor_arg =
       f "pre_warp_chunk_processor_arg" (ptr void)
-    let post_warp_chunk_processor =
+    let _post_warp_chunk_processor =
       f "post_warp_chunk_processor" (ptr void)
-    let post_warp_chunk_processor_arg =
+    let _post_warp_chunk_processor_arg =
       f "post_warp_chunk_processor_arg" (ptr void)
-    let cutline = f "cutline" (ptr void)
-    let cutline_blend_dist = f "cutline_blend_dist" double
+    let _cutline = f "cutline" (ptr void)
+    let _cutline_blend_dist = f "cutline_blend_dist" double
     let () = seal t
 
     let create =
@@ -131,7 +131,7 @@ module Options = struct
     setf !@o Raw.resample_alg i;
     ()
 
-  let set_working_data_type { o; } t =
+  let set_working_data_type { o; _ } t =
     let i = Band.Data.to_int t in
     setf !@o Raw.data_type i;
     ()
@@ -158,7 +158,7 @@ module Options = struct
     o.dst_bands <- Some dst;
     ()
 
-  let ptr_opt_of_list typ = function
+  let ptr_opt_of_list = function
     | [] -> None
     | l ->
       let a =
@@ -171,7 +171,7 @@ module Options = struct
     let bands = getf !@(o.o) Raw.band_count in
     let n = List.length l in
     if n > 0 && n <> bands then raise Band_count_mismatch;
-    match ptr_opt_of_list double l with
+    match ptr_opt_of_list l with
     | None ->
       setf !@(o.o) f None;
       None

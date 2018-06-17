@@ -49,10 +49,6 @@ let creation_options_to_ptr = function
   | None -> from_voidp string_opt null
   | Some ca -> CArray.start ca
 
-let convert_creation_options_to_ptr options =
-  convert_creation_options options
-  |> creation_options_to_ptr
-
 let set_cache_max =
   c "GDALSetCacheMax64"
     (int64_t @-> returning void)

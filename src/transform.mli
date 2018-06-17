@@ -62,7 +62,6 @@ val transform : _ t -> bool -> data_t -> data_t -> data_t -> result_t
 (** Ctype support functions for use from other modules *)
 
 open Ctypes
-open Foreign
 
 type 'a transform_t =
   'a -> int -> int -> float ptr -> float ptr -> float ptr -> int ptr -> int
