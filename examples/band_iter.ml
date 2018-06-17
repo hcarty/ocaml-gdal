@@ -16,13 +16,13 @@ let () =
   let maxv3x = ref min_int in
   (* Iterate over a single band *)
   Band.iter_read band (
-    fun col row v ->
+    fun _col _row v ->
       minv := min !minv v;
       maxv := max !maxv v;
   );
   (* Iterate over three bands, or at least one band three times *)
   Band.itera_read [|band; band|] band (
-    fun col row src dst ->
+    fun _col _row src dst ->
       let sum = Array.fold_left ( + ) dst src in
       minv3x := min !minv3x sum;
       maxv3x := max !maxv3x sum;

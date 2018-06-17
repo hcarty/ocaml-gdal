@@ -1,14 +1,12 @@
-.PHONY: all test benchmark doc repl clean gh-pages
+.PHONY: all lib examples doc repl clean gh-pages
 
-all:
+all: lib examples
+
+lib:
 	jbuilder build --dev
 
-test:
-	jbuilder runtest --dev
-
-benchmark:
-	jbuilder build benchmark/bench.exe
-	_build/default/benchmark/bench.exe
+examples:
+	jbuilder build --dev @examples
 
 doc:
 	jbuilder build @doc
