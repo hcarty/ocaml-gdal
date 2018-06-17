@@ -55,15 +55,6 @@ module Gen_img = struct
   let t = T.t
   let t_opt = T.t_opt
 
-  type reference_t = [
-      `data_set of Data_set.t
-    | `wkt of string
-  ]
-
-  let tuple_of_transform = function
-    | `data_set ds -> Some ds, None
-    | `wkt wkt -> None, Some wkt
-
   let create =
     Lib.c "GDALCreateGenImgProjTransformer"
       (Data_set.t_opt @-> string_opt @-> Data_set.t_opt @-> string_opt @->

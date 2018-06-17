@@ -1,41 +1,30 @@
-# OASIS_START
-# DO NOT EDIT (digest: a3c674b4239234cbbe53afe090018954)
+.PHONY: all lib examples doc repl clean gh-pages
 
-SETUP = ocaml setup.ml
+all: lib examples
 
-build: setup.data
-	$(SETUP) -build $(BUILDFLAGS)
+lib:
+	jbuilder build --dev
 
-doc: setup.data build
-	$(SETUP) -doc $(DOCFLAGS)
+examples:
+	jbuilder build --dev @examples
 
-test: setup.data build
-	$(SETUP) -test $(TESTFLAGS)
+doc:
+	jbuilder build @doc
 
-all:
-	$(SETUP) -all $(ALLFLAGS)
-
-install: setup.data
-	$(SETUP) -install $(INSTALLFLAGS)
-
-uninstall: setup.data
-	$(SETUP) -uninstall $(UNINSTALLFLAGS)
-
-reinstall: setup.data
-	$(SETUP) -reinstall $(REINSTALLFLAGS)
+repl:
+	jbuilder utop src
 
 clean:
-	$(SETUP) -clean $(CLEANFLAGS)
+	jbuilder clean
 
-distclean:
-	$(SETUP) -distclean $(DISTCLEANFLAGS)
-
-setup.data:
-	$(SETUP) -configure $(CONFIGUREFLAGS)
-
-configure:
-	$(SETUP) -configure $(CONFIGUREFLAGS)
-
-.PHONY: build doc test all install uninstall reinstall clean distclean configure
-
-# OASIS_STOP
+gh-pages: doc
+	git clone `git config --get remote.origin.url` .gh-pages --reference .
+	git -C .gh-pages checkout --orphan gh-pages
+	git -C .gh-pages reset
+	git -C .gh-pages clean -dxf
+	cp  -r _build/default/_doc/_html/* .gh-pages
+	git -C .gh-pages add .
+	git -C .gh-pages config user.email 'docs@endgame'
+	git -C .gh-pages commit -m "Update Pages"
+	git -C .gh-pages push origin gh-pages -f
+	rm -rf .gh-pages

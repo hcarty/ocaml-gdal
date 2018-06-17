@@ -1,5 +1,4 @@
 open Ctypes
-open Foreign
 
 exception Spatial_reference_error
 

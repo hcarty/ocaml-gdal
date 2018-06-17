@@ -49,14 +49,6 @@ module Data = struct
     | Int32 -> Bigarray.int32
     | Float32 -> Bigarray.float32
     | Float64 -> Bigarray.float64
-
-  let byte = Byte
-  let uint16 = UInt16
-  let int16 = Int16
-  let uint32 = UInt32
-  let int32 = Int32
-  let float32 = Float32
-  let float64 = Float64
 end
 
 exception IO_error
@@ -123,7 +115,7 @@ let io
     ((c, _) as t)
     (kind : ('v, 'e) Data.t)
   =
-  let (data_cols, data_rows) as size =
+  let size =
     match size with
     | None -> get_size t
     | Some s -> s

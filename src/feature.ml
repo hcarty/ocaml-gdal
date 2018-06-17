@@ -1,5 +1,4 @@
 open Ctypes
-open Foreign
 
 module Defn = struct
   type t = T.Defn.t

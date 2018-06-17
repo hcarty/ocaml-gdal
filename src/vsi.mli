@@ -2,12 +2,12 @@
 
 (** Virtual file system management *)
 
-type buffer_t =
-  (int, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
+type bigstring =
+  (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
 
 exception VSI_error
 
-val of_buffer : string -> buffer_t -> unit
+val of_buffer : string -> bigstring -> unit
 (** [of_buffer path buf] create a new virtual file at [path] with the bytes
     from [buf].
 

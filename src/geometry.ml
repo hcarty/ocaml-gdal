@@ -1,5 +1,4 @@
 open Ctypes
-open Foreign
 
 exception Geometry_error
 
