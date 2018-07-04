@@ -5,6 +5,8 @@ This library provides access to the GDAL library (http://www.gdal.org/).  It
 provides both direct, low-level access to GDAL and OGR library functions as
 well as a higher level, more OCaml-like interface.
 
+The API is [viewable here](http://hcarty.github.io/ocaml-gdal/gdal/index.html).
+
 Using the bindings
 ------------------
 
