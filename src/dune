@@ -1,0 +1,4 @@
+(library
+ (name gdal)
+ (public_name gdal)
+ (libraries ctypes ctypes.foreign))
