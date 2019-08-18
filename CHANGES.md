@@ -1,3 +1,6 @@
+# vNEXT
+- Upgrade build from jbuilder to dune
+
 # v0.10.0
 - Add `Field.get_name` (@igarnier)
 - Add `Data_source.get_layer_count` (@igarnier)

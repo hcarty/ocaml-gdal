@@ -3,19 +3,19 @@
 all: lib examples
 
 lib:
-	jbuilder build --dev
+	dune build
 
 examples:
-	jbuilder build --dev @examples
+	dune build @examples
 
 doc:
-	jbuilder build @doc
+	dune build @doc
 
 repl:
-	jbuilder utop src
+	dune utop src
 
 clean:
-	jbuilder clean
+	dune clean
 
 gh-pages: doc
 	git clone `git config --get remote.origin.url` .gh-pages --reference .
@@ -24,7 +24,7 @@ gh-pages: doc
 	git -C .gh-pages clean -dxf
 	cp  -r _build/default/_doc/_html/* .gh-pages
 	git -C .gh-pages add .
-	git -C .gh-pages config user.email 'docs@endgame'
+	git -C .gh-pages config user.email 'docs@docs'
 	git -C .gh-pages commit -m "Update Pages"
 	git -C .gh-pages push origin gh-pages -f
 	rm -rf .gh-pages
